@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head> 
+    <meta charset = "UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Rookvrij</title>
+
+    <style> 
+        body {
+            font-family: -apple-system, system-ui, sans-serif;
+            background-color: #0f172a;
+            color: #f1f5f9;
+            margin: 0;
+            padding: 24px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-top: 40px;
+        }
+
+        .kaart{
+            background-color: #7e293b;
+            border-radius: 16px;
+            padding: 24px;
+            margin-top: 24px;
+            font-size: 20px;
+        }
+
+        #opslaanKnop{
+            background-color: rgb(69, 4, 4);
+            color:rgb(123, 134, 11);
+            border: 2px solid rgb(123, 134, 11);
+            border-radius: 30px;
+            padding: 24px;
+            font-size: 20px;
+        }
+
+        #datumInvoer{
+            font-size: 20px;
+            color:rgb(123, 134, 11);
+        }
+    </style>
+
+</head>
+<body>
+    <h1>Rookvrij</h1>
+    <div class="kaart">
+        <p id="teller"></p>
+    </div>
+
+    <div class="kaart">
+        <p id="bespaard">Geld bespaard: €0</p>
+    </div>
+
+    <div class="kaart">
+        <p id="sigarettenCounter">Ongerookte peukies: 0 ciggies 🚬</p>
+    </div>
+
+    <div class="kaart">
+        <label for="datumInvoer">Stopdatum</label>
+        <input type="date" id="datumInvoer">
+        <button id="opslaanKnop">Opslaan</button>
+    </div>
+
+    <div class="kaart">
+        <h2>Trek?</h2>
+
+        <label for="triggerKeuze">Wat speelde er?</label>
+        <select id="triggerKeuze">
+            <option>Stress</option>
+            <option>Koffie</option>
+            <option>Na het eten</option>
+            <option>Alcohol</option>
+            <option>Verveling</option>
+            <option>Sociale druk</option>
+            <option>Had nog sigaretten over</option>
+            <option>Anders</option>
+        </select>
+
+        <label for="intensiteit">Hoe sterk? <span id="intensiteitWaarde">5</span>/10</label>
+        <input type="range" id="intensiteit" min="1" max="10" value="5">
+
+        <button id="trekKnop">Vastleggen</button>
+
+        <button id="gerooktKnop">Gerookt?</button>
+
+        <p id="trekVandaag">Vandaag: 0 keer trek</p>
+
+        <p id="trekTotaal">Totaal aantal trekmomenten: 0 keer trek</p>
+    </div>
+
+    <script>
+        // Instellingen
+        const sigarettenPerDag = 10;
+        const prijsPerPakje = 13;
+        const sigarettenPerPakje = 20;
+
+        // Afgeleide waarden
+        const prijsPerSigaret = prijsPerPakje / sigarettenPerPakje;
+        const prijsPerDag = sigarettenPerDag * prijsPerSigaret;
+
+        // Elementen opzoeken
+        const teller = document.getElementById("teller");
+        const bespaard = document.getElementById("bespaard");
+        const sigarettenCounter = document.getElementById("sigarettenCounter");
+        const datumInvoer = document.getElementById("datumInvoer");
+        const opslaanKnop = document.getElementById("opslaanKnop");
+        const triggerKeuze = document.getElementById("triggerKeuze");
+        const intensiteit = document.getElementById("intensiteit");
+        const intensiteitWaarde = document.getElementById("intensiteitWaarde");
+        const trekKnop = document.getElementById("trekKnop");
+        const trekVandaag = document.getElementById("trekVandaag");
+        const trekTotaal = document.getElementById("trekTotaal");
+        const gerooktKnop = document.getElementById("gerooktKnop");
+
+        // Stopdatum ophalen uit opslag, of standaard 1 oktober
+        let stopDatumTekst = localStorage.getItem("stopDatum") || "2026-10-01";
+        datumInvoer.value = stopDatumTekst;
+
+        function berekenAlles() {
+            const stopDatum = new Date(stopDatumTekst + "T00:00");
+            const vandaag = new Date();
+            const dagen = Math.floor((vandaag - stopDatum) / (1000 * 60 * 60 * 24));
+
+
+            if (vandaag >= stopDatum) { 
+                const geldBespaard = dagen * prijsPerDag;
+                const ongerookteSigaretten = dagen * sigarettenPerDag;
+
+                teller.textContent = `Dagen gestopt: ${dagen}`;
+                bespaard.textContent = `Geld bespaard: ${geldBespaard.toLocaleString("nl-NL", {style: "currency", currency: "EUR"})}`;
+                sigarettenCounter.textContent = `Ongerookte peukies: ${ongerookteSigaretten} ciggies 🚬`;
+            } else {
+                teller.textContent = `Nog ${-dagen} dagen tot je stopdatum`;
+                bespaard.textContent = `Geen zak bespaard :(`;
+                sigarettenCounter.textContent = `Nog geen sigaretten bespaard`;
+            }
+        }
+        function slaMomentOp(gerookt){
+            const moment = {
+                tijd: new Date().toISOString(),
+                trigger: triggerKeuze.value,
+                intensiteit: Number(intensiteit.value),
+                gerookt: gerookt
+            };
+            trekMomenten.push(moment);
+            localStorage.setItem("trekMomenten", JSON.stringify(trekMomenten));
+            toonTrek();
+        }
+        // Als je op Opslaan klikt
+        opslaanKnop.addEventListener("click", () => {
+            if (!datumInvoer.value) {
+                return;
+            }
+            stopDatumTekst = datumInvoer.value;
+            localStorage.setItem("stopDatum", stopDatumTekst);
+            berekenAlles();
+        });
+
+        // een keer uitvoeren bij het laden van de pagina
+        berekenAlles();
+        
+        // trekmomenten ophalen uit de opslag, of een lege lijst
+        let trekMomenten = JSON.parse(localStorage.getItem("trekMomenten")) || [];
+
+        // Getal naast de schuifbalk bijwerken tijdens het schuiven
+        intensiteit.addEventListener("input", () => {
+            intensiteitWaarde.textContent = intensiteit.value;
+        });
+
+        function toonTrek() {
+            const vandaagTekst = new Date().toDateString();
+            const aantalVandaag = trekMomenten.filter(
+                (moment) => new Date(moment.tijd).toDateString() === vandaagTekst
+            ).length;
+            const aantalTotaal = trekMomenten.length;
+            trekVandaag.textContent = `Vandaag: ${aantalVandaag} keer trek`;
+            trekTotaal.textContent = `Totaal aantal trekmomenten: ${aantalTotaal} keer trek`;
+        }
+
+        trekKnop.addEventListener("click", () => {
+            slaMomentOp(false);
+        });
+
+        gerooktKnop.addEventListener("click", () => {
+            if (!confirm("Heb je gerookt? Je streak begint opnieuw :(")) {
+                return;
+            }
+            slaMomentOp(false);
+           
+            const vandaagDatum = new Date().toLocaleDateString("sv-SE");
+
+            stopDatumTekst = vandaagDatum;
+            localStorage.setItem("stopDatum", stopDatumTekst);
+            datumInvoer.value = stopDatumTekst;
+
+            berekenAlles();
+        });
+
+        toonTrek();
+
+    </script>
+</body>
+</html>
+
