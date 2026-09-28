@@ -4,7 +4,7 @@
     <meta charset = "UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-title" content="Rookvrij"
+    <meta name="apple-mobile-web-app-title" content="Rookvrij">
     <title>Rookvrij</title>
 
     <style> 
@@ -43,6 +43,13 @@
             font-size: 20px;
             color:rgb(123, 134, 11);
         }
+
+        #instellingenKnop{
+            font-size: 40px;
+            background: none;
+            border: none;
+        }
+
     </style>
 
 </head>
@@ -58,12 +65,6 @@
 
     <div class="kaart">
         <p id="sigarettenCounter">Ongerookte peukies: 0 ciggies 🚬</p>
-    </div>
-
-    <div class="kaart">
-        <label for="datumInvoer">Stopdatum</label>
-        <input type="date" id="datumInvoer">
-        <button id="opslaanKnop">Opslaan</button>
     </div>
 
     <div class="kaart">
@@ -93,20 +94,45 @@
         <p id="trekTotaal">Totaal aantal trekmomenten: 0 keer trek</p>
     </div>
 
-    <div class="kaart">
-        <h2>Data</h2>
-        <button id="exportKnop">Export</button>
+    <button id="instellingenKnop">⚙️</button>
+
+    <div id="instellingenPaneel" hidden>
+        <div class="kaart">
+            <h2>Stopdatum</h2>
+            <input type="date" id="datumInvoer">
+            <button id="opslaanKnop">Opslaan</button>
+        </div>
+
+        <div class="kaart">
+            <h2>Instellingen</h2>
+            <label for="perDagInvoer">Sigaretten per dag: </label>
+            <input type="number" id="perDagInvoer" min="0">
+
+            <label for="prijsInvoer">Prijs per pakje: </label>
+            <input type="number" id="prijsInvoer" min="0" step="0.01">
+
+            <label for="perPakjeInvoer">Sigaretten per pakje: </label>
+            <input type="number" id="perPakjeInvoer" min="0">
+
+            <button id="instellingenOpslaan">Opslaan</button>
+        </div>
+
+        <div class="kaart">
+            <h2>Data</h2>
+            <button id="exportKnop">Export</button>
+
+            <label for="importInvoer">  Import</label>
+            <input type="file" id="importInvoer" accept=".csv">
+        </div>
     </div>
 
     <script>
         // Instellingen
-        const sigarettenPerDag = 10;
-        const prijsPerPakje = 13;
-        const sigarettenPerPakje = 20;
-
-        // Afgeleide waarden
-        const prijsPerSigaret = prijsPerPakje / sigarettenPerPakje;
-        const prijsPerDag = sigarettenPerDag * prijsPerSigaret;
+        let instellingen = JSON.parse(localStorage.getItem("instellingen")) || {
+            sigarettenPerDag: 10,
+            prijsPerPakje: 13,
+            sigarettenPerPakje: 20
+        };
 
         // Elementen opzoeken
         const teller = document.getElementById("teller");
@@ -122,20 +148,33 @@
         const trekTotaal = document.getElementById("trekTotaal");
         const gerooktKnop = document.getElementById("gerooktKnop");
         const exportKnop = document.getElementById("exportKnop");
+        const importInvoer = document.getElementById("importInvoer");
+        const instellingenOpslaan = document.getElementById("instellingenOpslaan");
+        const perDagInvoer = document.getElementById("perDagInvoer");
+        const prijsInvoer = document.getElementById("prijsInvoer");
+        const perPakjeInvoer = document.getElementById("perPakjeInvoer");
+        const instellingenKnop = document.getElementById("instellingenKnop");
+        const instellingenPaneel = document.getElementById("instellingenPaneel");
 
         // Stopdatum ophalen uit opslag, of standaard 1 oktober
         let stopDatumTekst = localStorage.getItem("stopDatum") || "2026-10-01";
         datumInvoer.value = stopDatumTekst;
 
+        // Instellingen ophalen
+        perDagInvoer.value = instellingen.sigarettenPerDag;
+        prijsInvoer.value = instellingen.prijsPerPakje;
+        perPakjeInvoer.value = instellingen.sigarettenPerPakje;
+
         function berekenAlles() {
             const stopDatum = new Date(stopDatumTekst + "T00:00");
             const vandaag = new Date();
             const dagen = Math.floor((vandaag - stopDatum) / (1000 * 60 * 60 * 24));
-
+            const prijsPerSigaret = instellingen.prijsPerPakje / instellingen.sigarettenPerPakje;
+            const prijsPerDag = instellingen.sigarettenPerDag * prijsPerSigaret;
 
             if (vandaag >= stopDatum) { 
                 const geldBespaard = dagen * prijsPerDag;
-                const ongerookteSigaretten = dagen * sigarettenPerDag;
+                const ongerookteSigaretten = dagen * instellingen.sigarettenPerDag;
 
                 teller.textContent = `Dagen gestopt: ${dagen}`;
                 bespaard.textContent = `Geld bespaard: ${geldBespaard.toLocaleString("nl-NL", {style: "currency", currency: "EUR"})}`;
@@ -146,6 +185,7 @@
                 sigarettenCounter.textContent = `Nog geen sigaretten bespaard`;
             }
         }
+
         function slaMomentOp(gerookt){
             const moment = {
                 tijd: new Date().toISOString(),
@@ -207,7 +247,7 @@
             if (!confirm("Heb je gerookt? Je streak begint opnieuw :(")) {
                 return;
             }
-            slaMomentOp(false);
+            slaMomentOp(true);
            
             const vandaagDatum = new Date().toLocaleDateString("sv-SE");
 
@@ -226,6 +266,59 @@
             const vandaagDatum = new Date().toLocaleDateString("sv-SE");
 
             downloadBestand(exportData, `exportData-${vandaagDatum}.csv`);
+        });
+
+        importInvoer.addEventListener("change", async () => {
+            const bestand = importInvoer.files[0];
+            if (!bestand) {
+                return;
+            }
+            const tekst = await bestand.text();
+            const regels = tekst.split("\n").slice(1).filter(
+                (regel) => regel !== ""
+            );
+
+            const momenten = regels.map((regel) => {
+                const [tijd, trigger, intensiteit, gerookt] = regel.split(",");
+                return{
+                    tijd: tijd,
+                    trigger: trigger,
+                    intensiteit: Number(intensiteit),
+                    gerookt: gerookt === "true"
+                };
+            });
+
+
+            if(!confirm("Wil je deze data importeren? Je huidige data verdwijnt")){
+                return;
+            }
+
+            trekMomenten = momenten;
+            localStorage.setItem("trekMomenten", JSON.stringify(trekMomenten));
+
+            toonTrek();
+
+        });
+
+        instellingenOpslaan.addEventListener("click", () => {
+            if (Number(prijsInvoer.value) <= 0) {
+                return alert("Een pakje kan niet 0 euro zijn!");
+            }
+            if (Number(perPakjeInvoer.value) <= 0) {
+                return alert("Een pakje kan niet 0 sigaretten hebben");
+            }
+
+            instellingen.sigarettenPerDag = Number(perDagInvoer.value);
+            instellingen.prijsPerPakje = Number(prijsInvoer.value);
+            instellingen.sigarettenPerPakje = Number(perPakjeInvoer.value);
+
+            localStorage.setItem("instellingen", JSON.stringify(instellingen));
+
+            berekenAlles();
+        });
+
+        instellingenKnop.addEventListener("click", () => {
+            instellingenPaneel.hidden = !instellingenPaneel.hidden;
         });
 
         toonTrek();
