@@ -3,6 +3,8 @@
 <head> 
     <meta charset = "UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Rookvrij"
     <title>Rookvrij</title>
 
     <style> 
@@ -91,6 +93,11 @@
         <p id="trekTotaal">Totaal aantal trekmomenten: 0 keer trek</p>
     </div>
 
+    <div class="kaart">
+        <h2>Data</h2>
+        <button id="exportKnop">Export</button>
+    </div>
+
     <script>
         // Instellingen
         const sigarettenPerDag = 10;
@@ -114,6 +121,7 @@
         const trekVandaag = document.getElementById("trekVandaag");
         const trekTotaal = document.getElementById("trekTotaal");
         const gerooktKnop = document.getElementById("gerooktKnop");
+        const exportKnop = document.getElementById("exportKnop");
 
         // Stopdatum ophalen uit opslag, of standaard 1 oktober
         let stopDatumTekst = localStorage.getItem("stopDatum") || "2026-10-01";
@@ -149,6 +157,17 @@
             localStorage.setItem("trekMomenten", JSON.stringify(trekMomenten));
             toonTrek();
         }
+
+        function downloadBestand(inhoud, bestandnaam) {
+            const blob = new Blob([inhoud], { type: "text/csv"});
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = bestandnaam;
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+
         // Als je op Opslaan klikt
         opslaanKnop.addEventListener("click", () => {
             if (!datumInvoer.value) {
@@ -197,6 +216,16 @@
             datumInvoer.value = stopDatumTekst;
 
             berekenAlles();
+        });
+
+        exportKnop.addEventListener("click", () => {
+            const kopregel = "tijd,trigger,intensiteit,gerookt";
+            const rijen = trekMomenten.map((moment) => `${moment.tijd},${moment.trigger},${moment.intensiteit},${moment.gerookt}`);
+            const tabel = rijen.join("\n");
+            const exportData = kopregel + "\n" + tabel;
+            const vandaagDatum = new Date().toLocaleDateString("sv-SE");
+
+            downloadBestand(exportData, `exportData-${vandaagDatum}.csv`);
         });
 
         toonTrek();
