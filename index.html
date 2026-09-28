@@ -8,11 +8,26 @@
     <title>Rookvrij</title>
 
     <style> 
+        * {
+            box-sizing: border-box;
+        }
+
+        :root {
+            --achtergrond: #0d2b45;
+            --kaart: #203c56;
+            --speciaal: #8d697a;
+            --randen: #544e68;
+            --accent: #ffaa5e;
+            --waarschuwingen: #d08159;
+            --tekst: #ffecd6;
+            --labels: #ffd4a3;
+        }
         body {
+            max-width: 480px;
+            margin: 0 auto;
             font-family: -apple-system, system-ui, sans-serif;
-            background-color: #0f172a;
-            color: #f1f5f9;
-            margin: 0;
+            background-color: var(--achtergrond);
+            color: var(--tekst);
             padding: 24px;
             text-align: center;
         }
@@ -22,32 +37,58 @@
             margin-top: 40px;
         }
 
+        .knop{
+            background-color: var(--accent);
+            color: var(--achtergrond);
+            border: none;
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        .waarschuwing{
+            background-color: var(--waarschuwingen);
+        }
+
+        .invoer{
+            background-color: var(--achtergrond);
+            color: var(--tekst);
+            border: 2px solid var(--randen);
+            font-size: 16px;
+            padding: 10px;
+            border-radius: 10px;
+        }
+
         .kaart{
-            background-color: #7e293b;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background-color: var(--kaart);
+            border: 4px solid var(--randen);
             border-radius: 16px;
             padding: 24px;
             margin-top: 24px;
             font-size: 20px;
         }
 
-        #opslaanKnop{
-            background-color: rgb(69, 4, 4);
-            color:rgb(123, 134, 11);
-            border: 2px solid rgb(123, 134, 11);
-            border-radius: 30px;
-            padding: 24px;
-            font-size: 20px;
-        }
-
-        #datumInvoer{
-            font-size: 20px;
-            color:rgb(123, 134, 11);
-        }
-
         #instellingenKnop{
             font-size: 40px;
             background: none;
             border: none;
+            color: var(--speciaal);
+        }
+
+        label, .bijschrift {
+            color: var(--labels);
+            font-size: 14px;
+        }
+
+        #intensiteit{
+            accent-color: var(--accent);
+        }
+
+        .kaart p, .kaart h2 {
+            margin:0
         }
 
     </style>
@@ -71,7 +112,7 @@
         <h2>Trek?</h2>
 
         <label for="triggerKeuze">Wat speelde er?</label>
-        <select id="triggerKeuze">
+        <select class="invoer" id="triggerKeuze">
             <option>Stress</option>
             <option>Koffie</option>
             <option>Na het eten</option>
@@ -83,46 +124,46 @@
         </select>
 
         <label for="intensiteit">Hoe sterk? <span id="intensiteitWaarde">5</span>/10</label>
-        <input type="range" id="intensiteit" min="1" max="10" value="5">
+        <input class="invoer" type="range" id="intensiteit" min="1" max="10" value="5">
 
-        <button id="trekKnop">Vastleggen</button>
+        <button class="knop" id="trekKnop">Vastleggen</button>
 
-        <button id="gerooktKnop">Gerookt?</button>
+        <button class="knop waarschuwing" id="gerooktKnop">Gerookt?</button>
 
-        <p id="trekVandaag">Vandaag: 0 keer trek</p>
+        <p class="bijschrift" id="trekVandaag">Vandaag: 0 keer trek</p>
 
-        <p id="trekTotaal">Totaal aantal trekmomenten: 0 keer trek</p>
+        <p class="bijschrift" id="trekTotaal">Totaal aantal trekmomenten: 0 keer trek</p>
     </div>
 
-    <button id="instellingenKnop">⚙️</button>
+    <button id="instellingenKnop"> ⚙︎ </button>
 
     <div id="instellingenPaneel" hidden>
         <div class="kaart">
             <h2>Stopdatum</h2>
-            <input type="date" id="datumInvoer">
-            <button id="opslaanKnop">Opslaan</button>
+            <input class="invoer" type="date" id="datumInvoer">
+            <button class="knop" id="opslaanKnop">Opslaan</button>
         </div>
 
         <div class="kaart">
             <h2>Instellingen</h2>
             <label for="perDagInvoer">Sigaretten per dag: </label>
-            <input type="number" id="perDagInvoer" min="0">
+            <input class="invoer" type="number" id="perDagInvoer" min="0">
 
             <label for="prijsInvoer">Prijs per pakje: </label>
-            <input type="number" id="prijsInvoer" min="0" step="0.01">
+            <input class="invoer" type="number" id="prijsInvoer" min="0" step="0.01">
 
             <label for="perPakjeInvoer">Sigaretten per pakje: </label>
-            <input type="number" id="perPakjeInvoer" min="0">
+            <input class="invoer" type="number" id="perPakjeInvoer" min="0">
 
-            <button id="instellingenOpslaan">Opslaan</button>
+            <button class="knop" id="instellingenOpslaan">Opslaan</button>
         </div>
 
         <div class="kaart">
             <h2>Data</h2>
-            <button id="exportKnop">Export</button>
+            <button class="knop" id="exportKnop">Export</button>
 
-            <label for="importInvoer">  Import</label>
-            <input type="file" id="importInvoer" accept=".csv">
+            <label class="knop" for="importInvoer">  Importeren</label>
+            <input type="file" id="importInvoer" accept=".csv" hidden>
         </div>
     </div>
 
