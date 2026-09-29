@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="Rookvrij">
+    <link rel="apple-touch-icon" href="icoon.png">
     <title>Rookvrij</title>
 
     <style> 
@@ -83,29 +84,38 @@
             font-size: 14px;
         }
 
+        .groot {
+            font-size: 40px;
+            font-weight: bold;
+            color: var(--accent);
+        }
+
         #intensiteit{
             accent-color: var(--accent);
         }
 
         .kaart p, .kaart h2 {
-            margin:0
+            margin:0;
         }
 
     </style>
 
 </head>
 <body>
-    <h1>Rookvrij</h1>
+    <h1>ROOKVRIJ</h1>
     <div class="kaart">
-        <p id="teller"></p>
+        <p class="groot" id="dagenGetal">0</p>
+        <p class="bijschrift" id="dagenTekst">dagen rookvrij</p>
     </div>
 
     <div class="kaart">
-        <p id="bespaard">Geld bespaard: €0</p>
+        <p class="groot" id="bespaardGetal">€0</p>
+        <p class="bijschrift" id="bespaardTekst">bespaard</p>
     </div>
 
     <div class="kaart">
-        <p id="sigarettenCounter">Ongerookte peukies: 0 ciggies 🚬</p>
+        <p class="groot" id="peukenGetal">0</p>
+        <p class="bijschrift" id="peukenTekst">ongerookte peukies 🚬</p>
     </div>
 
     <div class="kaart">
@@ -176,9 +186,12 @@
         };
 
         // Elementen opzoeken
-        const teller = document.getElementById("teller");
-        const bespaard = document.getElementById("bespaard");
-        const sigarettenCounter = document.getElementById("sigarettenCounter");
+        const dagenGetal = document.getElementById("dagenGetal");
+        const dagenTekst = document.getElementById("dagenTekst");
+        const bespaardGetal = document.getElementById("bespaardGetal");
+        const bespaardTekst = document.getElementById("bespaardTekst");
+        const peukenGetal = document.getElementById("peukenGetal");
+        const peukenTekst = document.getElementById("peukenTekst");
         const datumInvoer = document.getElementById("datumInvoer");
         const opslaanKnop = document.getElementById("opslaanKnop");
         const triggerKeuze = document.getElementById("triggerKeuze");
@@ -217,13 +230,19 @@
                 const geldBespaard = dagen * prijsPerDag;
                 const ongerookteSigaretten = dagen * instellingen.sigarettenPerDag;
 
-                teller.textContent = `Dagen gestopt: ${dagen}`;
-                bespaard.textContent = `Geld bespaard: ${geldBespaard.toLocaleString("nl-NL", {style: "currency", currency: "EUR"})}`;
-                sigarettenCounter.textContent = `Ongerookte peukies: ${ongerookteSigaretten} ciggies 🚬`;
+                dagenGetal.textContent = dagen;
+                dagenTekst.textContent = dagen === 1 ? "dag rookvrij" : "dagen rookvrij";
+                bespaardGetal.textContent = `${geldBespaard.toLocaleString("nl-NL", {style: "currency", currency: "EUR"})}`;
+                bespaardTekst.textContent = `bespaard`;
+                peukenGetal.textContent = ongerookteSigaretten;
+                peukenTekst.textContent = `ongerookte peukies 🚬`;
             } else {
-                teller.textContent = `Nog ${-dagen} dagen tot je stopdatum`;
-                bespaard.textContent = `Geen zak bespaard :(`;
-                sigarettenCounter.textContent = `Nog geen sigaretten bespaard`;
+                dagenGetal.textContent = `${-dagen}`;
+                dagenTekst.textContent = dagen === -1 ? "dag tot rookvrij" : "dagen tot rookvrij";
+                bespaardGetal.textContent = "€ 0,00";
+                bespaardTekst.textContent = `Geen zak bespaard :(`;
+                peukenGetal.textContent = "0";
+                peukenTekst.textContent = `Nog geen sigaretten bespaard`;
             }
         }
 
