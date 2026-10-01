@@ -1,3 +1,4 @@
+// ==== DATA OPHALEN ====
 
 // Motivatie
 let motivatie = JSON.parse(localStorage.getItem("motivatie")) || {
@@ -12,7 +13,16 @@ let instellingen = JSON.parse(localStorage.getItem("instellingen")) || {
     sigarettenPerPakje: 20
 };
 
-// Elementen opzoeken
+// trekmomenten ophalen uit de opslag, of een lege lijst
+let trekMomenten = JSON.parse(localStorage.getItem("trekMomenten")) || [];
+
+// Stopdatum ophalen uit opslag, of standaard 1 oktober
+let stopDatumTekst = localStorage.getItem("stopDatum") || "2026-10-01";
+
+
+
+// ==== ELEMENTEN OPZOEKEN ====
+
 const dagenGetal = document.getElementById("dagenGetal");
 const dagenTekst = document.getElementById("dagenTekst");
 const bespaardGetal = document.getElementById("bespaardGetal");
@@ -43,23 +53,11 @@ const redenenLijst = document.getElementById("redenenLijst");
 const redenenEnMotivatieOpslaanKnop = document.getElementById("redenenEnMotivatieOpslaanKnop");
 const motivatieTekstLimiet = document.getElementById("motivatieTekstLimiet");
 const meldingLegeRookLog = document.getElementById("meldingLegeRookLog");
-const rookLog = document.getElementById("rookLog");    
-//const ... = document.getElementById("...");
+const rookLog = document.getElementById("rookLog");   
 
 
-// Stopdatum ophalen uit opslag, of standaard 1 oktober
-let stopDatumTekst = localStorage.getItem("stopDatum") || "2026-10-01";
-datumInvoer.value = stopDatumTekst;
 
-// Motivatie ophalen
-motivatieTekstLimiet.textContent = motivatie.motiverendeTekst.length;
-motivatieInvoer.value = motivatie.motiverendeTekst;
-redenenInvoer.value = motivatie.motiverendeRedenen.join("\n");
-
-// Instellingen ophalen
-perDagInvoer.value = instellingen.sigarettenPerDag;
-prijsInvoer.value = instellingen.prijsPerPakje;
-perPakjeInvoer.value = instellingen.sigarettenPerPakje;
+// ==== FUNCTIES ====
 
 function berekenAlles() {
     const stopDatum = new Date(stopDatumTekst + "T00:00");
@@ -109,32 +107,6 @@ function downloadBestand(inhoud, bestandnaam) {
     link.click();
     URL.revokeObjectURL(url);
 }
-
-// Als je op Opslaan klikt
-opslaanKnop.addEventListener("click", () => {
-    if (!datumInvoer.value) {
-        return;
-    }
-    stopDatumTekst = datumInvoer.value;
-    localStorage.setItem("stopDatum", stopDatumTekst);
-    berekenAlles();
-});
-
-// een keer uitvoeren bij het laden van de pagina
-berekenAlles();
-
-// trekmomenten ophalen uit de opslag, of een lege lijst
-let trekMomenten = JSON.parse(localStorage.getItem("trekMomenten")) || [];
-
-// Getal naast de schuifbalk bijwerken tijdens het schuiven
-intensiteit.addEventListener("input", () => {
-    intensiteitWaarde.textContent = intensiteit.value;
-});
-
-// motivatie woordenteller
-motivatieInvoer.addEventListener("input", () => {
-    motivatieTekstLimiet.textContent = motivatieInvoer.value.length;
-});
 
 function toonTrek() {
     const vandaagTekst = new Date().toDateString();
@@ -201,6 +173,46 @@ function toonRookLog() {
     meldingLegeRookLog.hidden = rookMomenten.length > 0;
 
 }
+
+// ==== INVOERVELDEN ====
+
+// Stopdatum ophalen
+datumInvoer.value = stopDatumTekst;
+
+// Motivatie ophalen
+motivatieTekstLimiet.textContent = motivatie.motiverendeTekst.length;
+motivatieInvoer.value = motivatie.motiverendeTekst;
+redenenInvoer.value = motivatie.motiverendeRedenen.join("\n");
+
+// Instellingen ophalen
+perDagInvoer.value = instellingen.sigarettenPerDag;
+prijsInvoer.value = instellingen.prijsPerPakje;
+perPakjeInvoer.value = instellingen.sigarettenPerPakje;
+
+
+
+
+// ==== EVENTS ====
+
+// Als je op Opslaan klikt
+opslaanKnop.addEventListener("click", () => {
+    if (!datumInvoer.value) {
+        return;
+    }
+    stopDatumTekst = datumInvoer.value;
+    localStorage.setItem("stopDatum", stopDatumTekst);
+    berekenAlles();
+});
+
+// Getal naast de schuifbalk bijwerken tijdens het schuiven
+intensiteit.addEventListener("input", () => {
+    intensiteitWaarde.textContent = intensiteit.value;
+});
+
+// motivatie woordenteller
+motivatieInvoer.addEventListener("input", () => {
+    motivatieTekstLimiet.textContent = motivatieInvoer.value.length;
+});
 
 trekKnop.addEventListener("click", () => {
     slaMomentOp(false);
@@ -306,6 +318,10 @@ redenenEnMotivatieOpslaanKnop.addEventListener("click", () => {
 
     toonMotivatie();
 });
+
+// ==== START ====
+
+berekenAlles();
 
 toonMotivatie();
 
