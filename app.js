@@ -1,3 +1,11 @@
+// ==== TIJD ====
+
+const MS_PER_MINUUT = 1000 * 60;
+const MS_PER_UUR = MS_PER_MINUUT * 60;
+const MS_PER_DAG = MS_PER_UUR * 24;
+
+
+
 // ==== DATA OPHALEN ====
 
 // Motivatie
@@ -62,23 +70,27 @@ const rookLog = document.getElementById("rookLog");
 function berekenAlles() {
     const stopDatum = new Date(stopDatumTekst + "T00:00");
     const vandaag = new Date();
-    const dagen = Math.floor((vandaag - stopDatum) / (1000 * 60 * 60 * 24));
+    const MSVerschil = Math.abs(vandaag - stopDatum);
+    const minuten = Math.floor(MSVerschil/MS_PER_MINUUT % 60);
+    const uren = Math.floor(MSVerschil/MS_PER_UUR % 24);
+    const dagen = Math.floor(MSVerschil/MS_PER_DAG);
+
     const prijsPerSigaret = instellingen.prijsPerPakje / instellingen.sigarettenPerPakje;
     const prijsPerDag = instellingen.sigarettenPerDag * prijsPerSigaret;
 
     if (vandaag >= stopDatum) { 
-        const geldBespaard = dagen * prijsPerDag;
-        const ongerookteSigaretten = dagen * instellingen.sigarettenPerDag;
+        const geldBespaard = MSVerschil/MS_PER_DAG * prijsPerDag;
+        const ongerookteSigaretten = Math.floor(MSVerschil/MS_PER_DAG * instellingen.sigarettenPerDag);
 
-        dagenGetal.textContent = dagen;
-        dagenTekst.textContent = dagen === 1 ? "dag rookvrij" : "dagen rookvrij";
+        dagenGetal.textContent = `${dagen}d ${uren}u ${minuten}m`;
+        dagenTekst.textContent = "Rookvrij";
         bespaardGetal.textContent = `${geldBespaard.toLocaleString("nl-NL", {style: "currency", currency: "EUR"})}`;
-        bespaardTekst.textContent = `bespaard`;
+        bespaardTekst.textContent = `Bespaard`;
         peukenGetal.textContent = ongerookteSigaretten;
-        peukenTekst.textContent = `ongerookte peukies 🚬`;
+        peukenTekst.textContent = `Ongerookte peukies 🚬`;
     } else {
-        dagenGetal.textContent = `${-dagen}`;
-        dagenTekst.textContent = dagen === -1 ? "dag tot rookvrij" : "dagen tot rookvrij";
+        dagenGetal.textContent = `${dagen}d ${uren}u ${minuten}m`;
+        dagenTekst.textContent = "Tot rookvrij";
         bespaardGetal.textContent = "€ 0,00";
         bespaardTekst.textContent = `Geen zak bespaard :(`;
         peukenGetal.textContent = "0";
@@ -322,6 +334,8 @@ redenenEnMotivatieOpslaanKnop.addEventListener("click", () => {
 // ==== START ====
 
 berekenAlles();
+
+setInterval(berekenAlles, 1000);
 
 toonMotivatie();
 

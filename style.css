@@ -92,7 +92,7 @@ label, .bijschrift {
     font-size: 30px;
     font-weight: bold;
     color: var(--accent);
-    font-family: var(--letter-pixel);
+    font-family: var(--letter-tekst);
 }
 
 #intensiteit{
