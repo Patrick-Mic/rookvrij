@@ -7,102 +7,20 @@
     <meta name="apple-mobile-web-app-title" content="Rookvrij">
     <link rel="apple-touch-icon" href="icoon.png">
     <title>Rookvrij</title>
-
-    <style> 
-        * {
-            box-sizing: border-box;
-        }
-
-        :root {
-            --achtergrond: #0d2b45;
-            --kaart: #203c56;
-            --speciaal: #8d697a;
-            --randen: #544e68;
-            --accent: #ffaa5e;
-            --waarschuwingen: #d08159;
-            --tekst: #ffecd6;
-            --labels: #ffd4a3;
-        }
-        body {
-            max-width: 480px;
-            margin: 0 auto;
-            font-family: -apple-system, system-ui, sans-serif;
-            background-color: var(--achtergrond);
-            color: var(--tekst);
-            padding: 24px;
-            text-align: center;
-        }
-
-        h1 {
-            font-size: 28px;
-            margin-top: 40px;
-        }
-
-        .knop{
-            background-color: var(--accent);
-            color: var(--achtergrond);
-            border: none;
-            padding: 10px;
-            border-radius: 10px;
-            font-size: 14px;
-        }
-
-        .waarschuwing{
-            background-color: var(--waarschuwingen);
-        }
-
-        .invoer{
-            background-color: var(--achtergrond);
-            color: var(--tekst);
-            border: 2px solid var(--randen);
-            font-size: 16px;
-            padding: 10px;
-            border-radius: 10px;
-        }
-
-        .kaart{
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            background-color: var(--kaart);
-            border: 4px solid var(--randen);
-            border-radius: 16px;
-            padding: 24px;
-            margin-top: 24px;
-            font-size: 20px;
-        }
-
-        #instellingenKnop{
-            font-size: 40px;
-            background: none;
-            border: none;
-            color: var(--speciaal);
-        }
-
-        label, .bijschrift {
-            color: var(--labels);
-            font-size: 14px;
-        }
-
-        .groot {
-            font-size: 40px;
-            font-weight: bold;
-            color: var(--accent);
-        }
-
-        #intensiteit{
-            accent-color: var(--accent);
-        }
-
-        .kaart p, .kaart h2 {
-            margin:0;
-        }
-
-    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Pixelify+Sans:wght@400;700&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="style.css">
 
 </head>
 <body>
-    <h1>ROOKVRIJ</h1>
+    <h1>Rookvrij</h1>
+
+    <div>
+        <p id="motivatieTekst">prraaaar</p>
+    </div>
+
     <div class="kaart">
         <p class="groot" id="dagenGetal">0</p>
         <p class="bijschrift" id="dagenTekst">dagen rookvrij</p>
@@ -116,6 +34,11 @@
     <div class="kaart">
         <p class="groot" id="peukenGetal">0</p>
         <p class="bijschrift" id="peukenTekst">ongerookte peukies 🚬</p>
+    </div>
+
+    <div class="kaart">
+        <h2>Waarom ik stop</h2>
+        <ul id="redenenLijst"></ul>
     </div>
 
     <div class="kaart">
@@ -169,221 +92,33 @@
         </div>
 
         <div class="kaart">
+            <h2>Motivatie</h2>
+            <label for="motivatieInvoer">Motiverende zin</label>
+            <textarea class="invoer" id="motivatieInvoer" rows="3" maxlength="100" placeholder="Dit is mijn motivatie..."></textarea>
+            <label for="motivatieInvoer"><span id="motivatieTekstLimiet">0</span>/100</label>
+
+            <label for="redenenInvoer">Redenen</label>
+            <textarea class="invoer" id="redenenInvoer" placeholder="Beter kunnen sporten&#10;Geld sparen"></textarea>
+            
+            <button class="knop" id="redenenEnMotivatieOpslaanKnop">Opslaan</button>
+        </div>
+
+        <div class="kaart">
             <h2>Data</h2>
             <button class="knop" id="exportKnop">Export</button>
 
             <label class="knop" for="importInvoer">  Importeren</label>
             <input type="file" id="importInvoer" accept=".csv" hidden>
         </div>
+
+        <div class="kaart">
+            <h2>Logboek</h2>
+            <ul id="rookLog"></ul>
+            <p class="bijschrift" id="meldingLegeRookLog">Nog niet gerookt!</p>
+        </div>
     </div>
 
-    <script>
-        // Instellingen
-        let instellingen = JSON.parse(localStorage.getItem("instellingen")) || {
-            sigarettenPerDag: 10,
-            prijsPerPakje: 13,
-            sigarettenPerPakje: 20
-        };
-
-        // Elementen opzoeken
-        const dagenGetal = document.getElementById("dagenGetal");
-        const dagenTekst = document.getElementById("dagenTekst");
-        const bespaardGetal = document.getElementById("bespaardGetal");
-        const bespaardTekst = document.getElementById("bespaardTekst");
-        const peukenGetal = document.getElementById("peukenGetal");
-        const peukenTekst = document.getElementById("peukenTekst");
-        const datumInvoer = document.getElementById("datumInvoer");
-        const opslaanKnop = document.getElementById("opslaanKnop");
-        const triggerKeuze = document.getElementById("triggerKeuze");
-        const intensiteit = document.getElementById("intensiteit");
-        const intensiteitWaarde = document.getElementById("intensiteitWaarde");
-        const trekKnop = document.getElementById("trekKnop");
-        const trekVandaag = document.getElementById("trekVandaag");
-        const trekTotaal = document.getElementById("trekTotaal");
-        const gerooktKnop = document.getElementById("gerooktKnop");
-        const exportKnop = document.getElementById("exportKnop");
-        const importInvoer = document.getElementById("importInvoer");
-        const instellingenOpslaan = document.getElementById("instellingenOpslaan");
-        const perDagInvoer = document.getElementById("perDagInvoer");
-        const prijsInvoer = document.getElementById("prijsInvoer");
-        const perPakjeInvoer = document.getElementById("perPakjeInvoer");
-        const instellingenKnop = document.getElementById("instellingenKnop");
-        const instellingenPaneel = document.getElementById("instellingenPaneel");
-
-        // Stopdatum ophalen uit opslag, of standaard 1 oktober
-        let stopDatumTekst = localStorage.getItem("stopDatum") || "2026-10-01";
-        datumInvoer.value = stopDatumTekst;
-
-        // Instellingen ophalen
-        perDagInvoer.value = instellingen.sigarettenPerDag;
-        prijsInvoer.value = instellingen.prijsPerPakje;
-        perPakjeInvoer.value = instellingen.sigarettenPerPakje;
-
-        function berekenAlles() {
-            const stopDatum = new Date(stopDatumTekst + "T00:00");
-            const vandaag = new Date();
-            const dagen = Math.floor((vandaag - stopDatum) / (1000 * 60 * 60 * 24));
-            const prijsPerSigaret = instellingen.prijsPerPakje / instellingen.sigarettenPerPakje;
-            const prijsPerDag = instellingen.sigarettenPerDag * prijsPerSigaret;
-
-            if (vandaag >= stopDatum) { 
-                const geldBespaard = dagen * prijsPerDag;
-                const ongerookteSigaretten = dagen * instellingen.sigarettenPerDag;
-
-                dagenGetal.textContent = dagen;
-                dagenTekst.textContent = dagen === 1 ? "dag rookvrij" : "dagen rookvrij";
-                bespaardGetal.textContent = `${geldBespaard.toLocaleString("nl-NL", {style: "currency", currency: "EUR"})}`;
-                bespaardTekst.textContent = `bespaard`;
-                peukenGetal.textContent = ongerookteSigaretten;
-                peukenTekst.textContent = `ongerookte peukies 🚬`;
-            } else {
-                dagenGetal.textContent = `${-dagen}`;
-                dagenTekst.textContent = dagen === -1 ? "dag tot rookvrij" : "dagen tot rookvrij";
-                bespaardGetal.textContent = "€ 0,00";
-                bespaardTekst.textContent = `Geen zak bespaard :(`;
-                peukenGetal.textContent = "0";
-                peukenTekst.textContent = `Nog geen sigaretten bespaard`;
-            }
-        }
-
-        function slaMomentOp(gerookt){
-            const moment = {
-                tijd: new Date().toISOString(),
-                trigger: triggerKeuze.value,
-                intensiteit: Number(intensiteit.value),
-                gerookt: gerookt
-            };
-            trekMomenten.push(moment);
-            localStorage.setItem("trekMomenten", JSON.stringify(trekMomenten));
-            toonTrek();
-        }
-
-        function downloadBestand(inhoud, bestandnaam) {
-            const blob = new Blob([inhoud], { type: "text/csv"});
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            link.href = url;
-            link.download = bestandnaam;
-            link.click();
-            URL.revokeObjectURL(url);
-        }
-
-        // Als je op Opslaan klikt
-        opslaanKnop.addEventListener("click", () => {
-            if (!datumInvoer.value) {
-                return;
-            }
-            stopDatumTekst = datumInvoer.value;
-            localStorage.setItem("stopDatum", stopDatumTekst);
-            berekenAlles();
-        });
-
-        // een keer uitvoeren bij het laden van de pagina
-        berekenAlles();
-        
-        // trekmomenten ophalen uit de opslag, of een lege lijst
-        let trekMomenten = JSON.parse(localStorage.getItem("trekMomenten")) || [];
-
-        // Getal naast de schuifbalk bijwerken tijdens het schuiven
-        intensiteit.addEventListener("input", () => {
-            intensiteitWaarde.textContent = intensiteit.value;
-        });
-
-        function toonTrek() {
-            const vandaagTekst = new Date().toDateString();
-            const aantalVandaag = trekMomenten.filter(
-                (moment) => new Date(moment.tijd).toDateString() === vandaagTekst
-            ).length;
-            const aantalTotaal = trekMomenten.length;
-            trekVandaag.textContent = `Vandaag: ${aantalVandaag} keer trek`;
-            trekTotaal.textContent = `Totaal aantal trekmomenten: ${aantalTotaal} keer trek`;
-        }
-
-        trekKnop.addEventListener("click", () => {
-            slaMomentOp(false);
-        });
-
-        gerooktKnop.addEventListener("click", () => {
-            if (!confirm("Heb je gerookt? Je streak begint opnieuw :(")) {
-                return;
-            }
-            slaMomentOp(true);
-           
-            const vandaagDatum = new Date().toLocaleDateString("sv-SE");
-
-            stopDatumTekst = vandaagDatum;
-            localStorage.setItem("stopDatum", stopDatumTekst);
-            datumInvoer.value = stopDatumTekst;
-
-            berekenAlles();
-        });
-
-        exportKnop.addEventListener("click", () => {
-            const kopregel = "tijd,trigger,intensiteit,gerookt";
-            const rijen = trekMomenten.map((moment) => `${moment.tijd},${moment.trigger},${moment.intensiteit},${moment.gerookt}`);
-            const tabel = rijen.join("\n");
-            const exportData = kopregel + "\n" + tabel;
-            const vandaagDatum = new Date().toLocaleDateString("sv-SE");
-
-            downloadBestand(exportData, `exportData-${vandaagDatum}.csv`);
-        });
-
-        importInvoer.addEventListener("change", async () => {
-            const bestand = importInvoer.files[0];
-            if (!bestand) {
-                return;
-            }
-            const tekst = await bestand.text();
-            const regels = tekst.split("\n").slice(1).filter(
-                (regel) => regel !== ""
-            );
-
-            const momenten = regels.map((regel) => {
-                const [tijd, trigger, intensiteit, gerookt] = regel.split(",");
-                return{
-                    tijd: tijd,
-                    trigger: trigger,
-                    intensiteit: Number(intensiteit),
-                    gerookt: gerookt === "true"
-                };
-            });
-
-
-            if(!confirm("Wil je deze data importeren? Je huidige data verdwijnt")){
-                return;
-            }
-
-            trekMomenten = momenten;
-            localStorage.setItem("trekMomenten", JSON.stringify(trekMomenten));
-
-            toonTrek();
-
-        });
-
-        instellingenOpslaan.addEventListener("click", () => {
-            if (Number(prijsInvoer.value) <= 0) {
-                return alert("Een pakje kan niet 0 euro zijn!");
-            }
-            if (Number(perPakjeInvoer.value) <= 0) {
-                return alert("Een pakje kan niet 0 sigaretten hebben");
-            }
-
-            instellingen.sigarettenPerDag = Number(perDagInvoer.value);
-            instellingen.prijsPerPakje = Number(prijsInvoer.value);
-            instellingen.sigarettenPerPakje = Number(perPakjeInvoer.value);
-
-            localStorage.setItem("instellingen", JSON.stringify(instellingen));
-
-            berekenAlles();
-        });
-
-        instellingenKnop.addEventListener("click", () => {
-            instellingenPaneel.hidden = !instellingenPaneel.hidden;
-        });
-
-        toonTrek();
-
-    </script>
+    <script src="app.js"></script>
 </body>
 </html>
 

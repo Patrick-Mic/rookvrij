@@ -1,0 +1,137 @@
+* {
+    box-sizing: border-box;
+}
+
+:root {
+    --achtergrond: #0d2b45;
+    --kaart: #203c56;
+    --speciaal: #8d697a;
+    --randen: #544e68;
+    --accent: #ffaa5e;
+    --waarschuwingen: #d08159;
+    --tekst: #ffecd6;
+    --labels: #ffd4a3;
+    --letter-pixel: "Press Start 2P", monospace;
+    --letter-kopjes: "Pixelify Sans";
+    --letter-tekst: "Nunito";
+    --letter-tekst-2: "Space Grotesk";
+}
+body {
+    max-width: 480px;
+    margin: 0 auto;
+    font-family: var(--letter-tekst);
+    background-color: var(--achtergrond);
+    color: var(--tekst);
+    padding: 24px;
+    text-align: center;
+    letter-spacing: 2px;
+}
+
+h1 {
+    font-family: var(--letter-pixel);
+    font-size: 28px;
+    margin-top: 40px;
+    text-shadow: 3px 3px 0 var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+h2 {
+    font-family: var(--letter-pixel);
+    font-size: 20px;
+}
+
+.knop{
+    background-color: var(--accent);
+    color: var(--achtergrond);
+    border: none;
+    padding: 10px;
+    border-radius: 10px;
+    font-size: 14px;
+}
+
+.waarschuwing{
+    background-color: var(--waarschuwingen);
+}
+
+.invoer{
+    background-color: var(--achtergrond);
+    color: var(--tekst);
+    border: 2px solid var(--randen);
+    font-size: 16px;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.kaart{
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background-color: var(--kaart);
+    border: 4px solid var(--randen);
+    border-radius: 16px;
+    padding: 24px;
+    margin-top: 24px;
+    font-size: 20px;
+    overflow-wrap: break-word;
+}
+
+#instellingenKnop{
+    font-size: 40px;
+    background: none;
+    border: none;
+    color: var(--speciaal);
+}
+
+label, .bijschrift {
+    color: var(--labels);
+    font-size: 14px;
+}
+
+.groot {
+    font-size: 30px;
+    font-weight: bold;
+    color: var(--accent);
+    font-family: var(--letter-pixel);
+}
+
+#intensiteit{
+    accent-color: var(--accent);
+}
+
+.kaart p, .kaart h2 {
+    margin:0;
+}
+
+#motivatieTekst {
+    font-size: 20px;
+    color: var(--labels);
+    font-style: italic;
+    overflow-wrap: break-word;
+}
+
+#redenenLijst, #rookLog {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    color: var(--labels);
+    font-size: 16px;
+}
+
+#redenenLijst li::before { 
+    content: "♥ "; }
+
+button, input, select, textarea {
+    font-family: inherit;
+}
+
+.verwijderKnop {
+    font-size: 16px;
+    background-color: var(--achtergrond);
+    color: var(--accent);
+    cursor: pointer;
+    border: none;
+}
