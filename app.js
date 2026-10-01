@@ -25,8 +25,11 @@ let instellingen = JSON.parse(localStorage.getItem("instellingen")) || {
 let trekMomenten = JSON.parse(localStorage.getItem("trekMomenten")) || [];
 
 // Stopdatum ophalen uit opslag, of standaard 1 oktober
-let stopDatumTekst = localStorage.getItem("stopDatum") || "2026-10-01";
+let stopMoment = localStorage.getItem("stopDatum") || "2026-10-01";
 
+if (!stopMoment.includes("T")) {
+    stopMoment = new Date(stopMoment + "T00:00").toISOString();
+}
 
 
 // ==== ELEMENTEN OPZOEKEN ====
@@ -68,7 +71,7 @@ const rookLog = document.getElementById("rookLog");
 // ==== FUNCTIES ====
 
 function berekenAlles() {
-    const stopDatum = new Date(stopDatumTekst + "T00:00");
+    const stopDatum = new Date(stopMoment);
     const vandaag = new Date();
     const MSVerschil = Math.abs(vandaag - stopDatum);
     const minuten = Math.floor(MSVerschil/MS_PER_MINUUT % 60);
@@ -186,10 +189,17 @@ function toonRookLog() {
 
 }
 
+function momentNaarVeld(moment) {
+    return new Date(moment)
+        .toLocaleString("sv-SE")
+        .replace(" ", "T")
+        .slice(0, 16);
+}
+
 // ==== INVOERVELDEN ====
 
 // Stopdatum ophalen
-datumInvoer.value = stopDatumTekst;
+datumInvoer.value = momentNaarVeld(stopMoment);
 
 // Motivatie ophalen
 motivatieTekstLimiet.textContent = motivatie.motiverendeTekst.length;
@@ -211,8 +221,8 @@ opslaanKnop.addEventListener("click", () => {
     if (!datumInvoer.value) {
         return;
     }
-    stopDatumTekst = datumInvoer.value;
-    localStorage.setItem("stopDatum", stopDatumTekst);
+    stopMoment = new Date(datumInvoer.value).toISOString();
+    localStorage.setItem("stopDatum", stopMoment);
     berekenAlles();
 });
 
@@ -236,12 +246,9 @@ gerooktKnop.addEventListener("click", () => {
     }
     slaMomentOp(true);
     
-    const vandaagDatum = new Date().toLocaleDateString("sv-SE");
-
-    stopDatumTekst = vandaagDatum;
-    localStorage.setItem("stopDatum", stopDatumTekst);
-    datumInvoer.value = stopDatumTekst;
-
+    stopMoment = new Date().toISOString();
+    localStorage.setItem("stopDatum", stopMoment);
+    datumInvoer.value = momentNaarVeld(stopMoment);
     berekenAlles();
 
     toonRookLog();
