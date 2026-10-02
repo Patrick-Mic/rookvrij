@@ -1,8 +1,10 @@
-// ==== TIJD ====
+// ==== TIJD & VERSIE====
 
 const MS_PER_MINUUT = 1000 * 60;
 const MS_PER_UUR = MS_PER_MINUUT * 60;
 const MS_PER_DAG = MS_PER_UUR * 24;
+
+const VERSIE = "v0.5";
 
 
 
@@ -20,6 +22,12 @@ let instellingen = JSON.parse(localStorage.getItem("instellingen")) || {
     prijsPerPakje: 13,
     sigarettenPerPakje: 20
 };
+
+// deelnemerscode ophalen
+if (!instellingen.deelnemersCode) {
+    instellingen.deelnemersCode = crypto.randomUUID().slice(0, 6).toUpperCase();
+    localStorage.setItem("instellingen", JSON.stringify(instellingen));
+}
 
 // trekmomenten ophalen uit de opslag, of een lege lijst
 let trekMomenten = JSON.parse(localStorage.getItem("trekMomenten")) || [];
@@ -65,6 +73,8 @@ const redenenEnMotivatieOpslaanKnop = document.getElementById("redenenEnMotivati
 const motivatieTekstLimiet = document.getElementById("motivatieTekstLimiet");
 const meldingLegeRookLog = document.getElementById("meldingLegeRookLog");
 const rookLog = document.getElementById("rookLog");   
+const codeTekst = document.getElementById("codeTekst");
+const versieTekst = document.getElementById("versieTekst");
 
 
 
@@ -211,6 +221,12 @@ perDagInvoer.value = instellingen.sigarettenPerDag;
 prijsInvoer.value = instellingen.prijsPerPakje;
 perPakjeInvoer.value = instellingen.sigarettenPerPakje;
 
+// Persoonlijke code ophalen
+codeTekst.textContent = instellingen.deelnemersCode;
+
+// versie ophalen
+versieTekst.textContent = VERSIE;
+
 
 
 
@@ -255,13 +271,13 @@ gerooktKnop.addEventListener("click", () => {
 });
 
 exportKnop.addEventListener("click", () => {
-    const kopregel = "tijd,trigger,intensiteit,gerookt";
-    const rijen = trekMomenten.map((moment) => `${moment.tijd},${moment.trigger},${moment.intensiteit},${moment.gerookt}`);
+    const kopregel = "tijd,trigger,intensiteit,gerookt, deelnemer";
+    const rijen = trekMomenten.map((moment) => `${moment.tijd},${moment.trigger},${moment.intensiteit},${moment.gerookt},${instellingen.deelnemersCode}`);
     const tabel = rijen.join("\n");
     const exportData = kopregel + "\n" + tabel;
     const vandaagDatum = new Date().toLocaleDateString("sv-SE");
 
-    downloadBestand(exportData, `exportData-${vandaagDatum}.csv`);
+    downloadBestand(exportData, `${instellingen.deelnemersCode}-${vandaagDatum}.csv`);
 });
 
 importInvoer.addEventListener("change", async () => {
