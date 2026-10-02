@@ -4,7 +4,7 @@ const MS_PER_MINUUT = 1000 * 60;
 const MS_PER_UUR = MS_PER_MINUUT * 60;
 const MS_PER_DAG = MS_PER_UUR * 24;
 
-const VERSIE = "v0.5";
+const VERSIE = "v0.6";
 
 
 
@@ -86,6 +86,7 @@ const welkomMotivatieTekstLimiet = document.getElementById("welkomMotivatieTekst
 const welkomRedenenInvoer = document.getElementById("welkomRedenenInvoer");
 const welkomOpslaan = document.getElementById("welkomOpslaan");
 const welkomScherm = document.getElementById("welkomScherm");
+const exportTimer = document.getElementById("exportTimer");
 
 
 
@@ -252,6 +253,27 @@ function verwerkRedenen(tekst) {
     return redenen.slice(0, 5);
 }
 
+function toonExportHerinnering() {
+    const exportDatum = localStorage.getItem("laatsteExport");
+
+    if (!exportDatum) {
+        exportTimer.textContent = "Nog nooit geëxporteerd";
+        return;
+    }
+    
+    const dagenSindsExport = Math.floor((new Date() - new Date(exportDatum))/MS_PER_DAG);
+    if (dagenSindsExport === 0) {
+        exportTimer.textContent = "Laatste export: vandaag";
+    } else if (dagenSindsExport === 1) {
+        exportTimer.textContent = "Laatste export: gisteren";
+    } else {
+        exportTimer.textContent = `Laatste export: ${dagenSindsExport} dagen geleden`;
+    }
+
+    exportTimer.classList.toggle("waarschuwingTekst", dagenSindsExport > 7);
+
+}
+
 
 
 // ==== EVENTS ====
@@ -304,8 +326,13 @@ exportKnop.addEventListener("click", () => {
     const tabel = rijen.join("\n");
     const exportData = kopregel + "\n" + tabel;
     const vandaagDatum = new Date().toLocaleDateString("sv-SE");
+    const laatsteExport = new Date();
+
+    localStorage.setItem("laatsteExport", new Date().toISOString());
 
     downloadBestand(exportData, `${instellingen.deelnemersCode}-${vandaagDatum}.csv`);
+
+    toonExportHerinnering();
 });
 
 importInvoer.addEventListener("change", async () => {
@@ -432,3 +459,5 @@ toonTrek();
 toonRookLog();
 
 vulInvoervelden();
+
+toonExportHerinnering();

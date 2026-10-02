@@ -20,7 +20,8 @@
         <div class="kaart">
             <h1>Welkom bij Rookvrij</h1>
             <p>Rookvrij helpt je op weg naar een gezond, gelukkig en rookvrij leven. Vul de volgende gegevens in om te beginnen, je kan ze altijd veranderen in de instellingen.</p>
-            
+            <p class="bijschrift"><strong>Installeren:</strong> open de link in Safari, tik op het deel-icoon en kies "Zet op beginscherm".</p>
+
             <label for="welkomStartDatum">Wanneer ben je gestopt? </label>
             <input class="invoer" type="datetime-local" id="welkomStartDatum">
 
@@ -137,6 +138,8 @@
 
         <div class="kaart">
             <h2>Data</h2>
+            <p class="bijschrift" id="exportTimer"></p>
+
             <button class="knop" id="exportKnop">Export</button>
 
             <label class="knop" for="importInvoer">  Importeren</label>
@@ -147,6 +150,14 @@
             <h2>Logboek</h2>
             <ul id="rookLog"></ul>
             <p class="bijschrift" id="meldingLegeRookLog">Nog niet gerookt!</p>
+        </div>
+
+        <div class="kaart">
+            <h2>Over deze app</h2>
+            <p class="bijschrift"><strong>Installeren:</strong> open de link in Safari, tik op het deel-icoon en kies "Zet op beginscherm".</p>
+            <p class="bijschrift"><strong>Privacy:</strong> je data blijft op je eigen telefoon. Je data wordt door niemand gelezen behalve als je het deelt.</p>
+            <p class="bijschrift"><strong>Let op:</strong> het verwijderen van de app betekent dat je gegevens verdwijnen, maak dus geregeld een export.</p>
+            <p class="bijschrift"><strong>Delen:</strong> wil je meedoen aan mijn analyse? Deel je data dan wekelijks met mij via de exportknop zodat ik onderzoek kan doen naar wat tot terugval leidt. De data is niet verbonden aan je naam en het delen is vrijwillig. Wil je dat ik je data verwijder? Stuur me je code.</p>
         </div>
     </div>
     <p class="bijschrift" id="versieTekst"></p>

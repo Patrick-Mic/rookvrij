@@ -144,3 +144,8 @@ button, input, select, textarea {
     padding:24px;
     z-index: 10;
 }
+
+.waarschuwingTekst {
+    color: var(--waarschuwingen);
+    font-weight: bold;
+}
