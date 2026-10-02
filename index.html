@@ -15,6 +15,36 @@
 
 </head>
 <body>
+
+    <div id="welkomScherm" hidden>
+        <div class="kaart">
+            <h1>Welkom bij Rookvrij</h1>
+            <p>Rookvrij helpt je op weg naar een gezond, gelukkig en rookvrij leven. Vul de volgende gegevens in om te beginnen, je kan ze altijd veranderen in de instellingen.</p>
+            
+            <label for="welkomStartDatum">Wanneer ben je gestopt? </label>
+            <input class="invoer" type="datetime-local" id="welkomStartDatum">
+
+            <label for="welkomPerDagInvoer">Hoeveel sigaretten rook je per dag? </label>
+            <input class="invoer" type="number" id="welkomPerDagInvoer" min="0">
+
+            <label for="welkomPrijsInvoer">Hoeveel kost een pakje? </label>
+            <input class="invoer" type="number" id="welkomPrijsInvoer" min="0" step="0.01">
+
+            <label for="welkomPerPakjeInvoer">Hoeveel sigaretten zitten in een pakje? </label>
+            <input class="invoer" type="number" id="welkomPerPakjeInvoer" min="0">
+
+            <label for="welkomMotivatieInvoer">Wat is een zin die je motiveert?</label>
+            <textarea class="invoer" id="welkomMotivatieInvoer" rows="3" maxlength="100" placeholder="Dit is mijn motivatie..."></textarea>
+            <label for="welkomMotivatieInvoer"><span id="welkomMotivatieTekstLimiet">0</span>/100</label>
+
+            <label for="welkomRedenenInvoer">Wat zijn je redenen om te stoppen? max 5</label>
+            <textarea class="invoer" id="welkomRedenenInvoer" placeholder="Beter kunnen sporten&#10;Geld sparen"></textarea>
+            
+            <button class="knop" id="welkomOpslaan">Start</button>
+    
+        </div>
+    </div>
+    
     <h1>Rookvrij</h1>
 
     <div>
@@ -79,7 +109,7 @@
 
         <div class="kaart">
             <h2>Instellingen</h2>
-            <p class="bijschrift">Jouw code: <span id="codeTekst"></span></span></p>
+            <p class="bijschrift">Jouw code: <span id="codeTekst"></span></p>
 
             <label for="perDagInvoer">Sigaretten per dag: </label>
             <input class="invoer" type="number" id="perDagInvoer" min="0">

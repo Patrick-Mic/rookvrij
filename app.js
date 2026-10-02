@@ -32,13 +32,15 @@ if (!instellingen.deelnemersCode) {
 // trekmomenten ophalen uit de opslag, of een lege lijst
 let trekMomenten = JSON.parse(localStorage.getItem("trekMomenten")) || [];
 
-// Stopdatum ophalen uit opslag, of standaard 1 oktober
-let stopMoment = localStorage.getItem("stopDatum") || "2026-10-01";
+// Stopdatum ophalen uit opslag, of huidige datum
+let stopMoment = localStorage.getItem("stopDatum") || new Date().toISOString();
 
 if (!stopMoment.includes("T")) {
     stopMoment = new Date(stopMoment + "T00:00").toISOString();
 }
 
+// Is het een nieuwe gebruiker
+const isNieuweGebruiker = localStorage.getItem("stopDatum") === null;
 
 // ==== ELEMENTEN OPZOEKEN ====
 
@@ -75,6 +77,16 @@ const meldingLegeRookLog = document.getElementById("meldingLegeRookLog");
 const rookLog = document.getElementById("rookLog");   
 const codeTekst = document.getElementById("codeTekst");
 const versieTekst = document.getElementById("versieTekst");
+const welkomStartDatum = document.getElementById("welkomStartDatum");
+const welkomPerDagInvoer = document.getElementById("welkomPerDagInvoer");
+const welkomPrijsInvoer = document.getElementById("welkomPrijsInvoer");
+const welkomPerPakjeInvoer = document.getElementById("welkomPerPakjeInvoer");
+const welkomMotivatieInvoer = document.getElementById("welkomMotivatieInvoer");
+const welkomMotivatieTekstLimiet = document.getElementById("welkomMotivatieTekstLimiet");
+const welkomRedenenInvoer = document.getElementById("welkomRedenenInvoer");
+const welkomOpslaan = document.getElementById("welkomOpslaan");
+const welkomScherm = document.getElementById("welkomScherm");
+
 
 
 
@@ -206,27 +218,39 @@ function momentNaarVeld(moment) {
         .slice(0, 16);
 }
 
-// ==== INVOERVELDEN ====
+function vulInvoervelden() {
+    // Stopdatum ophalen
+    datumInvoer.value = momentNaarVeld(stopMoment);
 
-// Stopdatum ophalen
-datumInvoer.value = momentNaarVeld(stopMoment);
+    // Motivatie ophalen
+    motivatieTekstLimiet.textContent = motivatie.motiverendeTekst.length;
+    motivatieInvoer.value = motivatie.motiverendeTekst;
+    redenenInvoer.value = motivatie.motiverendeRedenen.join("\n");
 
-// Motivatie ophalen
-motivatieTekstLimiet.textContent = motivatie.motiverendeTekst.length;
-motivatieInvoer.value = motivatie.motiverendeTekst;
-redenenInvoer.value = motivatie.motiverendeRedenen.join("\n");
+    // Instellingen ophalen
+    perDagInvoer.value = instellingen.sigarettenPerDag;
+    prijsInvoer.value = instellingen.prijsPerPakje;
+    perPakjeInvoer.value = instellingen.sigarettenPerPakje;
 
-// Instellingen ophalen
-perDagInvoer.value = instellingen.sigarettenPerDag;
-prijsInvoer.value = instellingen.prijsPerPakje;
-perPakjeInvoer.value = instellingen.sigarettenPerPakje;
+    // Persoonlijke code ophalen
+    codeTekst.textContent = instellingen.deelnemersCode;
 
-// Persoonlijke code ophalen
-codeTekst.textContent = instellingen.deelnemersCode;
+    // versie ophalen
+    versieTekst.textContent = VERSIE;
+}
 
-// versie ophalen
-versieTekst.textContent = VERSIE;
+function verwerkRedenen(tekst) {
+    const redenen = tekst
+        .split("\n")
+        .map((reden) => reden.trim().slice(0, 60))
+        .filter((reden) => reden !== "");
 
+    if (redenen.length > 5) {
+        alert("Te veel redenen, alleen de eerste 5 zijn opgeslagen.");
+    }
+
+    return redenen.slice(0, 5);
+}
 
 
 
@@ -252,6 +276,10 @@ motivatieInvoer.addEventListener("input", () => {
     motivatieTekstLimiet.textContent = motivatieInvoer.value.length;
 });
 
+welkomMotivatieInvoer.addEventListener("input", () => {
+    welkomMotivatieTekstLimiet.textContent = welkomMotivatieInvoer.value.length;
+});
+
 trekKnop.addEventListener("click", () => {
     slaMomentOp(false);
 });
@@ -271,7 +299,7 @@ gerooktKnop.addEventListener("click", () => {
 });
 
 exportKnop.addEventListener("click", () => {
-    const kopregel = "tijd,trigger,intensiteit,gerookt, deelnemer";
+    const kopregel = "tijd,trigger,intensiteit,gerookt,deelnemer";
     const rijen = trekMomenten.map((moment) => `${moment.tijd},${moment.trigger},${moment.intensiteit},${moment.gerookt},${instellingen.deelnemersCode}`);
     const tabel = rijen.join("\n");
     const exportData = kopregel + "\n" + tabel;
@@ -337,16 +365,7 @@ instellingenKnop.addEventListener("click", () => {
 
 redenenEnMotivatieOpslaanKnop.addEventListener("click", () => {
     motivatie.motiverendeTekst = motivatieInvoer.value;
-
-    const redenen = redenenInvoer.value.split("\n").map((reden => reden.trim().slice(0,60))).filter(
-        (reden) => reden !== ""
-    );
-    if (redenen.length > 5) {
-        alert("Teveel redenen alleen de eerste 5 zijn opgeslagen");
-        motivatie.motiverendeRedenen = redenen.slice(0,5);
-    } else {
-        motivatie.motiverendeRedenen = redenen;
-    }
+    motivatie.motiverendeRedenen = verwerkRedenen(redenenInvoer.value);
     redenenInvoer.value = motivatie.motiverendeRedenen.join("\n");
 
     localStorage.setItem("motivatie", JSON.stringify(motivatie));
@@ -354,7 +373,53 @@ redenenEnMotivatieOpslaanKnop.addEventListener("click", () => {
     toonMotivatie();
 });
 
+welkomOpslaan.addEventListener("click", () => {
+    if (!welkomStartDatum.value) {
+        alert("Vul een geldige datum in.");
+        return;
+    }
+    if (Number(welkomPerDagInvoer.value) <= 0) {
+        alert("Vul in hoeveel sigaretten je per dag rookte.");
+        return;
+    }
+    if (Number(welkomPrijsInvoer.value) <= 0) {
+        alert("Vul een prijs in die hoger is dan 0.");
+        return;
+    }
+    if(Number(welkomPerPakjeInvoer.value) <=0) {
+        alert("Vul een hoeveelheid per pakje in die groter is dan 0.");
+        return;
+    }
+
+    instellingen.sigarettenPerDag = Number(welkomPerDagInvoer.value);
+    instellingen.prijsPerPakje = Number(welkomPrijsInvoer.value);
+    instellingen.sigarettenPerPakje = Number(welkomPerPakjeInvoer.value);
+
+    stopMoment = new Date(welkomStartDatum.value).toISOString();
+
+    motivatie.motiverendeTekst = welkomMotivatieInvoer.value;
+    motivatie.motiverendeRedenen = verwerkRedenen(welkomRedenenInvoer.value);
+
+    localStorage.setItem("instellingen", JSON.stringify(instellingen));
+    localStorage.setItem("motivatie", JSON.stringify(motivatie));
+    localStorage.setItem("stopDatum", stopMoment);
+
+    welkomScherm.hidden = true;
+
+    berekenAlles();
+    toonMotivatie();
+    vulInvoervelden();
+});
+
+
+
+
 // ==== START ====
+
+if (isNieuweGebruiker) {
+    welkomScherm.hidden = false;
+    welkomStartDatum.value = momentNaarVeld(new Date());
+}
 
 berekenAlles();
 
@@ -365,3 +430,5 @@ toonMotivatie();
 toonTrek();
 
 toonRookLog();
+
+vulInvoervelden();
