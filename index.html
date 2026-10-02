@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head> 
-    <meta charset = "UTF-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="Rookvrij">
@@ -18,151 +18,162 @@
 
     <div id="welkomScherm" hidden>
         <div class="kaart">
-            <h1>Welkom bij Rookvrij</h1>
-            <p>Rookvrij helpt je op weg naar een gezond, gelukkig en rookvrij leven. Vul de volgende gegevens in om te beginnen, je kan ze altijd veranderen in de instellingen.</p>
-            <p class="bijschrift"><strong>Installeren:</strong> open de link in Safari, tik op het deel-icoon en kies "Zet op beginscherm".</p>
+            <h1 data-tekst="welkomTitel">Welkom bij Rookvrij</h1>
+            <p data-tekst="welkomIntro">Rookvrij helpt je op weg naar een gezond, gelukkig en rookvrij leven. Vul de volgende gegevens in om te beginnen. Je kunt ze altijd veranderen in de instellingen.</p>
+            <p class="bijschrift"><strong data-tekst="installerenKop">Installeren:</strong> <span data-tekst="installerenTekst">open de link in Safari, tik op het deel-icoon en kies "Zet op beginscherm".</span></p>
 
-            <label for="welkomStartDatum">Wanneer ben je gestopt? </label>
+            <label for="welkomTaalKeuze" data-tekst="taal">Taal:</label>
+            <select class="invoer" id="welkomTaalKeuze">
+                <option value="nl">Nederlands</option>
+                <option value="en">English</option>
+            </select>
+
+            <label for="welkomStartDatum" data-tekst="welkomStopVraag">Wanneer ben je gestopt?</label>
             <input class="invoer" type="datetime-local" id="welkomStartDatum">
 
-            <label for="welkomPerDagInvoer">Hoeveel sigaretten rook je per dag? </label>
+            <label for="welkomPerDagInvoer" data-tekst="welkomPerDagVraag">Hoeveel sigaretten rookte je per dag?</label>
             <input class="invoer" type="number" id="welkomPerDagInvoer" min="0">
 
-            <label for="welkomPrijsInvoer">Hoeveel kost een pakje? </label>
+            <label for="welkomPrijsInvoer" data-tekst="welkomPrijsVraag">Hoeveel kost een pakje?</label>
             <input class="invoer" type="number" id="welkomPrijsInvoer" min="0" step="0.01">
 
-            <label for="welkomPerPakjeInvoer">Hoeveel sigaretten zitten in een pakje? </label>
+            <label for="welkomPerPakjeInvoer" data-tekst="welkomPerPakjeVraag">Hoeveel sigaretten zitten er in een pakje?</label>
             <input class="invoer" type="number" id="welkomPerPakjeInvoer" min="0">
 
-            <label for="welkomMotivatieInvoer">Wat is een zin die je motiveert?</label>
-            <textarea class="invoer" id="welkomMotivatieInvoer" rows="3" maxlength="100" placeholder="Dit is mijn motivatie..."></textarea>
+            <label for="welkomMotivatieInvoer" data-tekst="welkomMotivatieVraag">Wat is een zin die je motiveert?</label>
+            <textarea class="invoer" id="welkomMotivatieInvoer" rows="3" maxlength="100" data-placeholder="motivatiePlaceholder" placeholder="Dit is mijn motivatie..."></textarea>
             <label for="welkomMotivatieInvoer"><span id="welkomMotivatieTekstLimiet">0</span>/100</label>
 
-            <label for="welkomRedenenInvoer">Wat zijn je redenen om te stoppen? max 5</label>
-            <textarea class="invoer" id="welkomRedenenInvoer" placeholder="Beter kunnen sporten&#10;Geld sparen"></textarea>
+            <label for="welkomRedenenInvoer" data-tekst="welkomRedenenVraag">Wat zijn je redenen om te stoppen? (max. 5, één per regel)</label>
+            <textarea class="invoer" id="welkomRedenenInvoer" data-placeholder="redenenPlaceholder" placeholder="Beter kunnen sporten&#10;Geld sparen"></textarea>
             
-            <button class="knop" id="welkomOpslaan">Start</button>
-    
+            <button class="knop" id="welkomOpslaan" data-tekst="start">Start</button>
         </div>
     </div>
     
     <h1>Rookvrij</h1>
 
     <div>
-        <p id="motivatieTekst">prraaaar</p>
+        <p id="motivatieTekst"></p>
     </div>
 
     <div class="kaart">
         <p class="groot" id="dagenGetal">0</p>
-        <p class="bijschrift" id="dagenTekst">dagen rookvrij</p>
+        <p class="bijschrift" id="dagenTekst"></p>
     </div>
 
     <div class="kaart">
         <p class="groot" id="bespaardGetal">€0</p>
-        <p class="bijschrift" id="bespaardTekst">bespaard</p>
+        <p class="bijschrift" id="bespaardTekst"></p>
     </div>
 
     <div class="kaart">
         <p class="groot" id="peukenGetal">0</p>
-        <p class="bijschrift" id="peukenTekst">ongerookte peukies 🚬</p>
+        <p class="bijschrift" id="peukenTekst"></p>
     </div>
 
     <div class="kaart">
-        <h2>Waarom ik stop</h2>
+        <h2 data-tekst="waaromIkStop">Waarom ik stop</h2>
         <ul id="redenenLijst"></ul>
     </div>
 
     <div class="kaart">
-        <h2>Trek?</h2>
+        <h2 data-tekst="trek">Trek?</h2>
 
-        <label for="triggerKeuze">Wat speelde er?</label>
+        <label for="triggerKeuze" data-tekst="watSpeeldeEr">Wat speelde er?</label>
         <select class="invoer" id="triggerKeuze">
-            <option>Stress</option>
-            <option>Koffie</option>
-            <option>Na het eten</option>
-            <option>Alcohol</option>
-            <option>Verveling</option>
-            <option>Sociale druk</option>
-            <option>Had nog sigaretten over</option>
-            <option>Anders</option>
+            <option value="Stress" data-tekst="triggerStress">Stress</option>
+            <option value="Koffie" data-tekst="triggerKoffie">Koffie</option>
+            <option value="Na het eten" data-tekst="triggerNaEten">Na het eten</option>
+            <option value="Alcohol" data-tekst="triggerAlcohol">Alcohol</option>
+            <option value="Verveling" data-tekst="triggerVerveling">Verveling</option>
+            <option value="Sociale druk" data-tekst="triggerSocialeDruk">Sociale druk</option>
+            <option value="Had nog sigaretten over" data-tekst="triggerOver">Had nog sigaretten over</option>
+            <option value="Anders" data-tekst="triggerAnders">Anders</option>
         </select>
 
-        <label for="intensiteit">Hoe sterk? <span id="intensiteitWaarde">5</span>/10</label>
+        <label for="intensiteit"><span data-tekst="hoeSterk">Hoe sterk?</span> <span id="intensiteitWaarde">5</span>/10</label>
         <input class="invoer" type="range" id="intensiteit" min="1" max="10" value="5">
 
-        <button class="knop" id="trekKnop">Vastleggen</button>
+        <button class="knop" id="trekKnop" data-tekst="vastleggen">Vastleggen</button>
 
-        <button class="knop waarschuwing" id="gerooktKnop">Gerookt?</button>
+        <button class="knop waarschuwing" id="gerooktKnop" data-tekst="gerookt">Gerookt?</button>
 
-        <p class="bijschrift" id="trekVandaag">Vandaag: 0 keer trek</p>
+        <p class="bijschrift" id="trekVandaag"></p>
 
-        <p class="bijschrift" id="trekTotaal">Totaal aantal trekmomenten: 0 keer trek</p>
+        <p class="bijschrift" id="trekTotaal"></p>
     </div>
 
     <button id="instellingenKnop"> ⚙︎ </button>
 
     <div id="instellingenPaneel" hidden>
         <div class="kaart">
-            <h2>Stopdatum</h2>
+            <h2 data-tekst="stopdatum">Stopmoment</h2>
             <input class="invoer" type="datetime-local" id="datumInvoer">
-            <button class="knop" id="opslaanKnop">Opslaan</button>
+            <button class="knop" id="opslaanKnop" data-tekst="opslaan">Opslaan</button>
         </div>
 
         <div class="kaart">
-            <h2>Instellingen</h2>
-            <p class="bijschrift">Jouw code: <span id="codeTekst"></span></p>
+            <h2 data-tekst="instellingen">Instellingen</h2>
+            <p class="bijschrift"><span data-tekst="jouwCode">Jouw code:</span> <span id="codeTekst"></span></p>
 
-            <label for="perDagInvoer">Sigaretten per dag: </label>
+            <label for="taalKeuze" data-tekst="taal">Taal:</label>
+            <select class="invoer" id="taalKeuze">
+                <option value="nl">Nederlands</option>
+                <option value="en">English</option>
+            </select>
+
+            <label for="perDagInvoer" data-tekst="perDag">Sigaretten per dag:</label>
             <input class="invoer" type="number" id="perDagInvoer" min="0">
 
-            <label for="prijsInvoer">Prijs per pakje: </label>
+            <label for="prijsInvoer" data-tekst="prijsPerPakje">Prijs per pakje:</label>
             <input class="invoer" type="number" id="prijsInvoer" min="0" step="0.01">
 
-            <label for="perPakjeInvoer">Sigaretten per pakje: </label>
+            <label for="perPakjeInvoer" data-tekst="perPakje">Sigaretten per pakje:</label>
             <input class="invoer" type="number" id="perPakjeInvoer" min="0">
 
-            <button class="knop" id="instellingenOpslaan">Opslaan</button>
+            <button class="knop" id="instellingenOpslaan" data-tekst="opslaan">Opslaan</button>
         </div>
 
         <div class="kaart">
-            <h2>Motivatie</h2>
-            <label for="motivatieInvoer">Motiverende zin</label>
-            <textarea class="invoer" id="motivatieInvoer" rows="3" maxlength="100" placeholder="Dit is mijn motivatie..."></textarea>
+            <h2 data-tekst="motivatieKop">Motivatie</h2>
+            <label for="motivatieInvoer" data-tekst="motiverendeZin">Motiverende zin</label>
+            <textarea class="invoer" id="motivatieInvoer" rows="3" maxlength="100" data-placeholder="motivatiePlaceholder" placeholder="Dit is mijn motivatie..."></textarea>
             <label for="motivatieInvoer"><span id="motivatieTekstLimiet">0</span>/100</label>
 
-            <label for="redenenInvoer">Redenen</label>
-            <textarea class="invoer" id="redenenInvoer" placeholder="Beter kunnen sporten&#10;Geld sparen"></textarea>
+            <label for="redenenInvoer" data-tekst="redenen">Redenen (max. 5, één per regel)</label>
+            <textarea class="invoer" id="redenenInvoer" data-placeholder="redenenPlaceholder" placeholder="Beter kunnen sporten&#10;Geld sparen"></textarea>
             
-            <button class="knop" id="redenenEnMotivatieOpslaanKnop">Opslaan</button>
+            <button class="knop" id="redenenEnMotivatieOpslaanKnop" data-tekst="opslaan">Opslaan</button>
         </div>
 
         <div class="kaart">
-            <h2>Data</h2>
+            <h2 data-tekst="data">Data</h2>
             <p class="bijschrift" id="exportTimer"></p>
 
-            <button class="knop" id="exportKnop">Export</button>
+            <button class="knop" id="exportKnop" data-tekst="export">Exporteren</button>
 
-            <label class="knop" for="importInvoer">  Importeren</label>
+            <label class="knop" for="importInvoer" data-tekst="importeren">Importeren</label>
             <input type="file" id="importInvoer" accept=".csv" hidden>
         </div>
 
         <div class="kaart">
-            <h2>Logboek</h2>
+            <h2 data-tekst="logboek">Logboek</h2>
             <ul id="rookLog"></ul>
-            <p class="bijschrift" id="meldingLegeRookLog">Nog niet gerookt!</p>
+            <p class="bijschrift" id="meldingLegeRookLog" data-tekst="nogNietGerookt">Nog niet gerookt!</p>
         </div>
 
         <div class="kaart">
-            <h2>Over deze app</h2>
-            <p class="bijschrift"><strong>Installeren:</strong> open de link in Safari, tik op het deel-icoon en kies "Zet op beginscherm".</p>
-            <p class="bijschrift"><strong>Privacy:</strong> je data blijft op je eigen telefoon. Je data wordt door niemand gelezen behalve als je het deelt.</p>
-            <p class="bijschrift"><strong>Let op:</strong> het verwijderen van de app betekent dat je gegevens verdwijnen, maak dus geregeld een export.</p>
-            <p class="bijschrift"><strong>Delen:</strong> wil je meedoen aan mijn analyse? Deel je data dan wekelijks met mij via de exportknop zodat ik onderzoek kan doen naar wat tot terugval leidt. De data is niet verbonden aan je naam en het delen is vrijwillig. Wil je dat ik je data verwijder? Stuur me je code.</p>
+            <h2 data-tekst="overDezeApp">Over deze app</h2>
+            <p class="bijschrift"><strong data-tekst="installerenKop">Installeren:</strong> <span data-tekst="installerenTekst">open de link in Safari, tik op het deel-icoon en kies "Zet op beginscherm".</span></p>
+            <p class="bijschrift"><strong data-tekst="privacyKop">Privacy:</strong> <span data-tekst="privacyTekst">je data blijft op je eigen telefoon. Niemand kan hem zien, tenzij je hem zelf deelt.</span></p>
+            <p class="bijschrift"><strong data-tekst="letOpKop">Let op:</strong> <span data-tekst="letOpTekst">als je de app verwijdert, verdwijnen je gegevens. Maak dus geregeld een export.</span></p>
+            <p class="bijschrift"><strong data-tekst="delenKop">Delen:</strong> <span data-tekst="delenTekst">wil je meedoen aan mijn analyse? Deel je data dan wekelijks met mij via de exportknop, zodat ik kan onderzoeken wat tot terugval leidt. Je data is niet gekoppeld aan je naam en delen is vrijwillig. Wil je dat ik je data verwijder? Stuur me je code.</span></p>
         </div>
     </div>
     <p class="bijschrift" id="versieTekst"></p>
 
+    <script src="teksten.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
-

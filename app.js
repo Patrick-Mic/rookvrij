@@ -4,8 +4,9 @@ const MS_PER_MINUUT = 1000 * 60;
 const MS_PER_UUR = MS_PER_MINUUT * 60;
 const MS_PER_DAG = MS_PER_UUR * 24;
 
-const VERSIE = "v0.6";
+const VERSIE = "v0.7";
 
+const STANDAARD_TAAL = navigator.language.startsWith("nl") ? "nl" : "en";
 
 
 // ==== DATA OPHALEN ====
@@ -20,12 +21,18 @@ let motivatie = JSON.parse(localStorage.getItem("motivatie")) || {
 let instellingen = JSON.parse(localStorage.getItem("instellingen")) || {
     sigarettenPerDag: 10,
     prijsPerPakje: 13,
-    sigarettenPerPakje: 20
+    sigarettenPerPakje: 20,
+    taal: STANDAARD_TAAL
 };
 
 // deelnemerscode ophalen
 if (!instellingen.deelnemersCode) {
     instellingen.deelnemersCode = crypto.randomUUID().slice(0, 6).toUpperCase();
+    localStorage.setItem("instellingen", JSON.stringify(instellingen));
+}
+
+if (!instellingen.taal) {
+    instellingen.taal = STANDAARD_TAAL;
     localStorage.setItem("instellingen", JSON.stringify(instellingen));
 }
 
@@ -87,11 +94,17 @@ const welkomRedenenInvoer = document.getElementById("welkomRedenenInvoer");
 const welkomOpslaan = document.getElementById("welkomOpslaan");
 const welkomScherm = document.getElementById("welkomScherm");
 const exportTimer = document.getElementById("exportTimer");
-
+const taalKeuze = document.getElementById("taalKeuze");
+const welkomTaalKeuze = document.getElementById("welkomTaalKeuze");
 
 
 
 // ==== FUNCTIES ====
+
+// Een bedrag als geld in de taal van de gebruiker, bijv. "€ 13,00" of "€13.00"
+function alsGeld(bedrag) {
+    return bedrag.toLocaleString(t("locale"), { style: "currency", currency: "EUR" });
+}
 
 function berekenAlles() {
     const stopDatum = new Date(stopMoment);
@@ -104,23 +117,26 @@ function berekenAlles() {
     const prijsPerSigaret = instellingen.prijsPerPakje / instellingen.sigarettenPerPakje;
     const prijsPerDag = instellingen.sigarettenPerDag * prijsPerSigaret;
 
+    // De afkortingen verschillen per taal: in het Engels is een uur "h" in plaats van "u"
+    const tijdTekst = `${dagen}${t("afkortingDag")} ${uren}${t("afkortingUur")} ${minuten}${t("afkortingMinuut")}`;
+
     if (vandaag >= stopDatum) { 
         const geldBespaard = MSVerschil/MS_PER_DAG * prijsPerDag;
         const ongerookteSigaretten = Math.floor(MSVerschil/MS_PER_DAG * instellingen.sigarettenPerDag);
 
-        dagenGetal.textContent = `${dagen}d ${uren}u ${minuten}m`;
-        dagenTekst.textContent = "Rookvrij";
-        bespaardGetal.textContent = `${geldBespaard.toLocaleString("nl-NL", {style: "currency", currency: "EUR"})}`;
-        bespaardTekst.textContent = `Bespaard`;
+        dagenGetal.textContent = tijdTekst;
+        dagenTekst.textContent = t("rookvrij");
+        bespaardGetal.textContent = alsGeld(geldBespaard);
+        bespaardTekst.textContent = t("bespaard");
         peukenGetal.textContent = ongerookteSigaretten;
-        peukenTekst.textContent = `Ongerookte peukies 🚬`;
+        peukenTekst.textContent = t("ongerookt");
     } else {
-        dagenGetal.textContent = `${dagen}d ${uren}u ${minuten}m`;
-        dagenTekst.textContent = "Tot rookvrij";
-        bespaardGetal.textContent = "€ 0,00";
-        bespaardTekst.textContent = `Geen zak bespaard :(`;
+        dagenGetal.textContent = tijdTekst;
+        dagenTekst.textContent = t("totRookvrij");
+        bespaardGetal.textContent = alsGeld(0);
+        bespaardTekst.textContent = t("geenBespaard");
         peukenGetal.textContent = "0";
-        peukenTekst.textContent = `Nog geen sigaretten bespaard`;
+        peukenTekst.textContent = t("nogGeenSigaretten");
     }
 }
 
@@ -152,21 +168,29 @@ function toonTrek() {
         (moment) => new Date(moment.tijd).toDateString() === vandaagTekst
     ).length;
     const aantalTotaal = trekMomenten.length;
-    trekVandaag.textContent = `Vandaag: ${aantalVandaag} keer trek`;
-    trekTotaal.textContent = `Totaal aantal trekmomenten: ${aantalTotaal} keer trek`;
+    trekVandaag.textContent = t("trekVandaag", aantalVandaag);
+    trekTotaal.textContent = t("trekTotaal", aantalTotaal);
 }
 
 function toonMotivatie() {
     if (motivatie.motiverendeTekst !== "") {
         motivatieTekst.textContent = motivatie.motiverendeTekst;
     } else {
-        motivatieTekst.textContent = "Schrijf je motivatie in de instellingen ⚙︎";
+        motivatieTekst.textContent = t("geenMotivatie");
     }   
     redenenLijst.textContent = "";
     motivatie.motiverendeRedenen.forEach((reden) => {
         const redenPlek = document.createElement("li");
         redenPlek.textContent = reden;
-        redenenLijst.appendChild(redenPlek);})
+        redenenLijst.appendChild(redenPlek);
+    });
+}
+
+// Zoekt bij een opgeslagen trigger (bijv. "Koffie") de getoonde, vertaalde tekst op (bijv. "Coffee").
+// De <select> weet al welke tekst bij welke waarde hoort, dus die gebruiken we als woordenboek.
+function triggerTekst(waarde) {
+    const optie = [...triggerKeuze.options].find((optie) => optie.value === waarde);
+    return optie ? optie.textContent : waarde;
 }
 
 function toonRookLog() {
@@ -177,31 +201,31 @@ function toonRookLog() {
 
     rookMomenten.forEach((rookMoment) => {
         const rookMomentPlek = document.createElement("li");
-        const datum = new Date(rookMoment.tijd).toLocaleString("nl-NL", {
+        const datum = new Date(rookMoment.tijd).toLocaleString(t("locale"), {
             weekday: "short",
             day: "numeric",
             month: "short",
             hour: "2-digit",
             minute: "2-digit"
         });
-        rookMomentPlek.textContent = `${datum} · ${rookMoment.trigger} · Trek: ${rookMoment.intensiteit}/10  `;
+        rookMomentPlek.textContent = `${datum} · ${triggerTekst(rookMoment.trigger)} · ${t("trekLabel")}: ${rookMoment.intensiteit}/10  `;
         
         const verwijderKnop = document.createElement("button");
-        verwijderKnop.textContent = "x";
+        verwijderKnop.textContent = "✕";
         verwijderKnop.className = "verwijderKnop";
         rookMomentPlek.appendChild(verwijderKnop);
 
         rookLog.appendChild(rookMomentPlek);
 
         verwijderKnop.addEventListener("click", () => {
-            if(!confirm("Wil je dit logmoment verwijderen?")){
+            if (!confirm(t("bevestigVerwijderen"))) {
                 return;
             }   
 
             trekMomenten = trekMomenten.filter(
                 (moment) => moment.tijd !== rookMoment.tijd
             );
-            localStorage.setItem("trekMomenten", JSON.stringify(trekMomenten))
+            localStorage.setItem("trekMomenten", JSON.stringify(trekMomenten));
 
             toonRookLog();
             toonTrek();
@@ -209,7 +233,6 @@ function toonRookLog() {
     });
 
     meldingLegeRookLog.hidden = rookMomenten.length > 0;
-
 }
 
 function momentNaarVeld(moment) {
@@ -222,6 +245,9 @@ function momentNaarVeld(moment) {
 function vulInvoervelden() {
     // Stopdatum ophalen
     datumInvoer.value = momentNaarVeld(stopMoment);
+
+    // taal
+    taalKeuze.value = instellingen.taal;
 
     // Motivatie ophalen
     motivatieTekstLimiet.textContent = motivatie.motiverendeTekst.length;
@@ -247,7 +273,7 @@ function verwerkRedenen(tekst) {
         .filter((reden) => reden !== "");
 
     if (redenen.length > 5) {
-        alert("Te veel redenen, alleen de eerste 5 zijn opgeslagen.");
+        alert(t("teVeelRedenen"));
     }
 
     return redenen.slice(0, 5);
@@ -257,28 +283,61 @@ function toonExportHerinnering() {
     const exportDatum = localStorage.getItem("laatsteExport");
 
     if (!exportDatum) {
-        exportTimer.textContent = "Nog nooit geëxporteerd";
+        exportTimer.textContent = t("nooitGeexporteerd");
         return;
     }
     
     const dagenSindsExport = Math.floor((new Date() - new Date(exportDatum))/MS_PER_DAG);
     if (dagenSindsExport === 0) {
-        exportTimer.textContent = "Laatste export: vandaag";
+        exportTimer.textContent = t("exportVandaag");
     } else if (dagenSindsExport === 1) {
-        exportTimer.textContent = "Laatste export: gisteren";
+        exportTimer.textContent = t("exportGisteren");
     } else {
-        exportTimer.textContent = `Laatste export: ${dagenSindsExport} dagen geleden`;
+        exportTimer.textContent = t("exportDagen", dagenSindsExport);
     }
 
     exportTimer.classList.toggle("waarschuwingTekst", dagenSindsExport > 7);
+}
 
+function t(sleutel, aantal) {
+    const tekst = TEKSTEN[instellingen.taal][sleutel] ?? sleutel;
+    return tekst.replace("{aantal}", aantal);
+}
+
+function vertaalPagina() {
+    document.querySelectorAll("[data-tekst]").forEach((element) => {
+        element.textContent = t(element.dataset.tekst);
+    });
+
+    document.querySelectorAll("[data-placeholder]").forEach((element) => {
+        element.placeholder = t(element.dataset.placeholder);
+    });
+
+    document.documentElement.lang = instellingen.taal;
+}
+
+function vernieuwScherm() {
+    vertaalPagina();
+    berekenAlles();
+    toonTrek();
+    toonMotivatie();
+    toonRookLog();
+    toonExportHerinnering();
+}
+
+function wisselTaal(nieuweTaal) {
+    instellingen.taal = nieuweTaal;
+    localStorage.setItem("instellingen", JSON.stringify(instellingen));
+    taalKeuze.value = nieuweTaal;
+    welkomTaalKeuze.value = nieuweTaal;
+    vernieuwScherm();
 }
 
 
 
 // ==== EVENTS ====
 
-// Als je op Opslaan klikt
+// Stopmoment opslaan
 opslaanKnop.addEventListener("click", () => {
     if (!datumInvoer.value) {
         return;
@@ -293,7 +352,7 @@ intensiteit.addEventListener("input", () => {
     intensiteitWaarde.textContent = intensiteit.value;
 });
 
-// motivatie woordenteller
+// motivatie tekenteller
 motivatieInvoer.addEventListener("input", () => {
     motivatieTekstLimiet.textContent = motivatieInvoer.value.length;
 });
@@ -307,7 +366,7 @@ trekKnop.addEventListener("click", () => {
 });
 
 gerooktKnop.addEventListener("click", () => {
-    if (!confirm("Heb je gerookt? Je streak begint opnieuw :(")) {
+    if (!confirm(t("bevestigGerookt"))) {
         return;
     }
     slaMomentOp(true);
@@ -326,7 +385,6 @@ exportKnop.addEventListener("click", () => {
     const tabel = rijen.join("\n");
     const exportData = kopregel + "\n" + tabel;
     const vandaagDatum = new Date().toLocaleDateString("sv-SE");
-    const laatsteExport = new Date();
 
     localStorage.setItem("laatsteExport", new Date().toISOString());
 
@@ -347,7 +405,7 @@ importInvoer.addEventListener("change", async () => {
 
     const momenten = regels.map((regel) => {
         const [tijd, trigger, intensiteit, gerookt] = regel.split(",");
-        return{
+        return {
             tijd: tijd,
             trigger: trigger,
             intensiteit: Number(intensiteit),
@@ -355,8 +413,7 @@ importInvoer.addEventListener("change", async () => {
         };
     });
 
-
-    if(!confirm("Wil je deze data importeren? Je huidige data verdwijnt")){
+    if (!confirm(t("bevestigImport"))) {
         return;
     }
 
@@ -364,17 +421,17 @@ importInvoer.addEventListener("change", async () => {
     localStorage.setItem("trekMomenten", JSON.stringify(trekMomenten));
 
     toonTrek();
-
     toonRookLog();
-
 });
 
 instellingenOpslaan.addEventListener("click", () => {
     if (Number(prijsInvoer.value) <= 0) {
-        return alert("Een pakje kan niet 0 euro zijn!");
+        alert(t("foutPrijs"));
+        return;
     }
     if (Number(perPakjeInvoer.value) <= 0) {
-        return alert("Een pakje kan niet 0 sigaretten hebben");
+        alert(t("foutPerPakje"));
+        return;
     }
 
     instellingen.sigarettenPerDag = Number(perDagInvoer.value);
@@ -402,19 +459,19 @@ redenenEnMotivatieOpslaanKnop.addEventListener("click", () => {
 
 welkomOpslaan.addEventListener("click", () => {
     if (!welkomStartDatum.value) {
-        alert("Vul een geldige datum in.");
+        alert(t("foutDatum"));
         return;
     }
     if (Number(welkomPerDagInvoer.value) <= 0) {
-        alert("Vul in hoeveel sigaretten je per dag rookte.");
+        alert(t("foutPerDag"));
         return;
     }
     if (Number(welkomPrijsInvoer.value) <= 0) {
-        alert("Vul een prijs in die hoger is dan 0.");
+        alert(t("foutPrijs"));
         return;
     }
-    if(Number(welkomPerPakjeInvoer.value) <=0) {
-        alert("Vul een hoeveelheid per pakje in die groter is dan 0.");
+    if (Number(welkomPerPakjeInvoer.value) <= 0) {
+        alert(t("foutPerPakje"));
         return;
     }
 
@@ -438,26 +495,26 @@ welkomOpslaan.addEventListener("click", () => {
     vulInvoervelden();
 });
 
+taalKeuze.addEventListener("change", () => {
+    wisselTaal(taalKeuze.value);
+});
+
+welkomTaalKeuze.addEventListener("change", () => {
+    wisselTaal(welkomTaalKeuze.value);
+});
 
 
 
 // ==== START ====
 
+vernieuwScherm();
+
 if (isNieuweGebruiker) {
+    welkomTaalKeuze = instellingen.taal;
     welkomScherm.hidden = false;
     welkomStartDatum.value = momentNaarVeld(new Date());
 }
 
-berekenAlles();
-
 setInterval(berekenAlles, 1000);
 
-toonMotivatie();
-
-toonTrek();
-
-toonRookLog();
-
 vulInvoervelden();
-
-toonExportHerinnering();
