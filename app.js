@@ -510,7 +510,7 @@ welkomTaalKeuze.addEventListener("change", () => {
 vernieuwScherm();
 
 if (isNieuweGebruiker) {
-    welkomTaalKeuze = instellingen.taal;
+    welkomTaalKeuze.value = instellingen.taal;
     welkomScherm.hidden = false;
     welkomStartDatum.value = momentNaarVeld(new Date());
 }
