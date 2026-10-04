@@ -3,14 +3,15 @@
 }
 
 :root {
-    --achtergrond: #0d2b45;
-    --kaart: #203c56;
-    --speciaal: #8d697a;
-    --randen: #544e68;
-    --accent: #ffaa5e;
-    --waarschuwingen: #d08159;
-    --tekst: #ffecd6;
-    --labels: #ffd4a3;
+    --achtergrond: #2a584f;
+    --kaart: #2f142f;
+    --speciaal: #6eb8a8;
+    --randen: #774448;
+    --accent: #ee9c5d;
+    --waarschuwingen: #c6505a;
+    --tekst: #fcffc0;
+    --labels: #6eb8a8;
+    --groen: #74a33f;         
     --letter-pixel: "Press Start 2P", monospace;
     --letter-kopjes: "Pixelify Sans";
     --letter-tekst: "Nunito";
