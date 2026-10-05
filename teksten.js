@@ -85,6 +85,8 @@ const TEKSTEN = {
         exportVandaag: "Laatste export: vandaag",
         exportGisteren: "Laatste export: gisteren",
         exportDagen: "Laatste export: {aantal} dagen geleden",
+        tikHint: "Tik op je boompje 🌱",
+        totMorgen: "Tot morgen!",
 
         // Meldingen
         bevestigVerwijderen: "Wil je dit logmoment verwijderen?",
@@ -179,6 +181,8 @@ const TEKSTEN = {
         exportVandaag: "Last export: today",
         exportGisteren: "Last export: yesterday",
         exportDagen: "Last export: {aantal} days ago",
+        tikHint: "Tap your tree 🌱",
+        totMorgen: "See you tomorrow!",
 
         // Messages
         bevestigVerwijderen: "Do you want to delete this entry?",

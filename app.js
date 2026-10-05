@@ -4,7 +4,7 @@ const MS_PER_MINUUT = 1000 * 60;
 const MS_PER_UUR = MS_PER_MINUUT * 60;
 const MS_PER_DAG = MS_PER_UUR * 24;
 
-const VERSIE = "v0.7";
+const VERSIE = "v0.8";
 
 const STANDAARD_TAAL = navigator.language.startsWith("nl") ? "nl" : "en";
 
@@ -97,7 +97,7 @@ const exportTimer = document.getElementById("exportTimer");
 const taalKeuze = document.getElementById("taalKeuze");
 const welkomTaalKeuze = document.getElementById("welkomTaalKeuze");
 const boomAfbeelding = document.getElementById("boomAfbeelding");
-
+const boomHint = document.getElementById("boomHint");
 
 
 // ==== FUNCTIES ====
@@ -140,7 +140,13 @@ function berekenAlles() {
         peukenTekst.textContent = t("nogGeenSigaretten");
     }
 
-    boomAfbeelding.src = kiesBoom(dagen);
+    if (vandaag < stopDatum) {
+        boomAfbeelding.src = "boom-1.png";
+    } else {
+        boomAfbeelding.src = kiesBoom(dagen);
+    }
+
+    toonBoomHint();
 }
 
 function slaMomentOp(gerookt){
@@ -344,6 +350,17 @@ function kiesBoom(dagen) {
     return "boom-1.png";
 }
 
+function toonBoomHint() {
+    const vandaag = momentNaarVeld(new Date()).slice(0,10);
+    const laatsteTik = localStorage.getItem("laatsteTik");
+
+    if (vandaag === laatsteTik) {
+        boomHint.textContent = t("totMorgen");
+    } else {
+        boomHint.textContent = t("tikHint");
+    }
+}
+
 
 
 // ==== EVENTS ====
@@ -515,7 +532,7 @@ welkomTaalKeuze.addEventListener("change", () => {
 });
 
 boomAfbeelding.addEventListener("click", () => {
-    const vandaag = momentNaarVeld(new Date()).slice(10);
+    const vandaag = momentNaarVeld(new Date()).slice(0, 10);
     const laatsteTik = localStorage.getItem("laatsteTik");
 
     if (vandaag === laatsteTik) return;
@@ -523,6 +540,9 @@ boomAfbeelding.addEventListener("click", () => {
     boomAfbeelding.classList.add("getikt");
 
     localStorage.setItem("laatsteTik", vandaag);
+
+    toonBoomHint();
+
 });
 
 boomAfbeelding.addEventListener("animationend", () => {
