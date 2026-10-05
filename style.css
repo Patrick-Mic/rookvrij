@@ -150,3 +150,9 @@ button, input, select, textarea {
     color: var(--waarschuwingen);
     font-weight: bold;
 }
+
+.boom{
+    width: 160px;
+    image-rendering: pixelated;
+    align-self: center;
+}

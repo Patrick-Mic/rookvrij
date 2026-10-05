@@ -96,6 +96,7 @@ const welkomScherm = document.getElementById("welkomScherm");
 const exportTimer = document.getElementById("exportTimer");
 const taalKeuze = document.getElementById("taalKeuze");
 const welkomTaalKeuze = document.getElementById("welkomTaalKeuze");
+const boomAfbeelding = document.getElementById("boomAfbeelding");
 
 
 
@@ -138,6 +139,8 @@ function berekenAlles() {
         peukenGetal.textContent = "0";
         peukenTekst.textContent = t("nogGeenSigaretten");
     }
+
+    boomAfbeelding.src = kiesBoom(dagen);
 }
 
 function slaMomentOp(gerookt){
@@ -331,6 +334,14 @@ function wisselTaal(nieuweTaal) {
     taalKeuze.value = nieuweTaal;
     welkomTaalKeuze.value = nieuweTaal;
     vernieuwScherm();
+}
+
+function kiesBoom(dagen) {
+    if (dagen >= 30) return "boom-5.png";
+    if (dagen >= 17) return "boom-4.png";
+    if (dagen >= 10) return "boom-3.png";
+    if (dagen >= 3) return "boom-2.png";
+    return "boom-1.png";
 }
 
 
