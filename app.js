@@ -514,6 +514,21 @@ welkomTaalKeuze.addEventListener("change", () => {
     wisselTaal(welkomTaalKeuze.value);
 });
 
+boomAfbeelding.addEventListener("click", () => {
+    const vandaag = momentNaarVeld(new Date()).slice(10);
+    const laatsteTik = localStorage.getItem("laatsteTik");
+
+    if (vandaag === laatsteTik) return;
+
+    boomAfbeelding.classList.add("getikt");
+
+    localStorage.setItem("laatsteTik", vandaag);
+});
+
+boomAfbeelding.addEventListener("animationend", () => {
+    boomAfbeelding.classList.remove("getikt");
+});
+
 
 
 // ==== START ====
