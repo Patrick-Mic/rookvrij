@@ -88,6 +88,18 @@ const TEKSTEN = {
         tikHint: "Tik op je boompje 🌱",
         totMorgen: "Tot morgen!",
 
+        // Gezondheid
+        mijlpalenKop: "Gezondheid",
+        mijlpalenBron: "Bron: NHS",
+        mijlpaal20min: "20 minuten: je hartslag wordt weer normaal",
+        mijlpaal8uur: "8 uur: het koolmonoxide in je bloed is gehalveerd",
+        mijlpaal2dagen: "2 dagen: je smaak en reuk worden beter",
+        mijlpaal3dagen: "3 dagen: ademen gaat makkelijker, je krijgt meer energie",
+        mijlpaal2weken: "2 weken: je bloedsomloop verbetert",
+        mijlpaal3maanden: "3 maanden: je longfunctie stijgt met tot 10%",
+        mijlpaal1jaar: "1 jaar: je risico op een hartaanval is gehalveerd",
+        mijlpaal10jaar: "10 jaar: je risico op overlijden aan longkanker is gehalveerd",
+
         // Meldingen
         bevestigVerwijderen: "Wil je dit logmoment verwijderen?",
         bevestigGerookt: "Heb je gerookt? Je streak begint opnieuw :(",
@@ -183,6 +195,18 @@ const TEKSTEN = {
         exportDagen: "Last export: {aantal} days ago",
         tikHint: "Tap your tree 🌱",
         totMorgen: "See you tomorrow!",
+
+        // Health
+        mijlpalenKop: "Health",
+        mijlpalenBron: "Source: NHS",
+        mijlpaal20min: "20 minutes: your pulse returns to normal",
+        mijlpaal8uur: "8 hours: carbon monoxide in your blood has halved",
+        mijlpaal2dagen: "2 days: your taste and smell improve",
+        mijlpaal3dagen: "3 days: breathing gets easier, your energy increases",
+        mijlpaal2weken: "2 weeks: your circulation improves",
+        mijlpaal3maanden: "3 months: your lung function increases by up to 10%",
+        mijlpaal1jaar: "1 year: your risk of heart attack has halved",
+        mijlpaal10jaar: "10 years: your risk of dying from lung cancer has halved",
 
         // Messages
         bevestigVerwijderen: "Do you want to delete this entry?",

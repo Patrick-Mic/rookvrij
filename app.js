@@ -4,10 +4,20 @@ const MS_PER_MINUUT = 1000 * 60;
 const MS_PER_UUR = MS_PER_MINUUT * 60;
 const MS_PER_DAG = MS_PER_UUR * 24;
 
-const VERSIE = "v0.8";
+const VERSIE = "v1.0";
 
 const STANDAARD_TAAL = navigator.language.startsWith("nl") ? "nl" : "en";
 
+const MIJLPALEN = [
+    { tijd: 20 * MS_PER_MINUUT, sleutel: "mijlpaal20min" },
+    { tijd: 8 * MS_PER_UUR,     sleutel: "mijlpaal8uur" },
+    { tijd: 2 * MS_PER_DAG,     sleutel: "mijlpaal2dagen" },
+    { tijd: 3 * MS_PER_DAG,     sleutel: "mijlpaal3dagen" },
+    { tijd: 14 * MS_PER_DAG,    sleutel: "mijlpaal2weken" },
+    { tijd: 90 * MS_PER_DAG,    sleutel: "mijlpaal3maanden" },
+    { tijd: 365 * MS_PER_DAG,   sleutel: "mijlpaal1jaar" },
+    { tijd: 3650 * MS_PER_DAG,  sleutel: "mijlpaal10jaar" }
+];
 
 // ==== DATA OPHALEN ====
 
@@ -98,6 +108,7 @@ const taalKeuze = document.getElementById("taalKeuze");
 const welkomTaalKeuze = document.getElementById("welkomTaalKeuze");
 const boomAfbeelding = document.getElementById("boomAfbeelding");
 const boomHint = document.getElementById("boomHint");
+const mijlpalenLijst = document.getElementById("mijlpalenLijst");
 
 
 // ==== FUNCTIES ====
@@ -147,6 +158,8 @@ function berekenAlles() {
     }
 
     toonBoomHint();
+
+    toonMijlpalen(vandaag >= stopDatum ? MSVerschil : 0);
 }
 
 function slaMomentOp(gerookt){
@@ -359,6 +372,20 @@ function toonBoomHint() {
     } else {
         boomHint.textContent = t("tikHint");
     }
+}
+
+function toonMijlpalen(msRookvrij) {
+    mijlpalenLijst.textContent = "";
+
+    MIJLPALEN.forEach((mijlpaal) => {
+        const behaald = msRookvrij >= mijlpaal.tijd;
+        const plek = document.createElement("li");
+
+        plek.textContent = (behaald ? "✓ " : "🔒 ") + t(mijlpaal.sleutel);
+        plek.classList.toggle("nogNiet", !behaald);
+
+        mijlpalenLijst.append(plek);
+    })
 }
 
 

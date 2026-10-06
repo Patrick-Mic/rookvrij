@@ -169,3 +169,12 @@ button, input, select, textarea {
     animation: tikAnimatie 0.5s ease-in-out;
     transform-origin: bottom;
 }
+
+#mijlpalenLijst {
+    list-style: none;
+    padding: 0;
+}
+
+.nogNiet {
+    opacity: 0.4;
+}
